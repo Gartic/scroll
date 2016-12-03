@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<style>
+			#container {
+				width: 300px;
+				height: 300px;
+				border: 1px solid gray;
+				position: relative;
+			}
+			#container.sombra-top:before, #container.sombra-middle:before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 10px;
+				background-color: rgba(0,0,0,.5);
+			}
+			#container.sombra-bottom:after, #container.sombra-middle:after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 10px;
+				background-color: rgba(0,0,0,.5);
+			}
+			#container>div {
+				height: 100%;
+				overflow: auto;
+			}
+
+			#fim {
+				height: 30px;
+				color: red;
+				line-height: 30px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div>
+				<div>Teste 1</div>
+				<div>Teste 2</div>
+				<div>Teste 3</div>
+				<div>Teste 4</div>
+				<div>Teste 5</div>
+				<div>Teste 6</div>
+				<div>Teste 7</div>
+				<div>Teste 8</div>
+				<div>Teste 9</div>
+				<div>Teste 10</div>
+				<div>Teste 11</div>
+				<div>Teste 12</div>
+				<div>Teste 13</div>
+				<div>Teste 14</div>
+				<div>Teste 15</div>
+				<div>Teste 16</div>
+				<div>Teste 17</div>
+				<div>Teste 18</div>
+				<div>Teste 19</div>
+				<div>Teste 20</div>
+				<div>Teste 21</div>
+				<div>Teste 22</div>
+				<div>Teste 23</div>
+				<div>Teste 24</div>
+				<div>Teste 25</div>
+			</div>
+		</div>
+		<div id="fim"></div>
+		<button id="add">Adicionar</button>
+
+		<script src="../dependencias/bundle.js"></script>
+		<script src="../../src/scroll.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>

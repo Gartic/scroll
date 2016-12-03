@@ -1,0 +1,1 @@
+global.Eventos = require('eventos');

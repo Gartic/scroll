@@ -1,0 +1,34 @@
+{
+  "name": "scroll",
+  "version": "1.0.0",
+  "description": "Tratamento genérico de scroll no Gartic",
+  "main": "build/scroll.js",
+  "scripts": {
+    "test": "eslint src/",
+    "build": "npm run test && babel src -d build && browserify demos/dependencias/script.js -o demos/dependencias/bundle.js && git add build/scroll.js"
+  },
+  "pre-commit": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gartic/scroll.git"
+  },
+  "keywords": [
+    "gartic"
+  ],
+  "author": "Henrique Moreira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gartic/scroll/issues"
+  },
+  "homepage": "https://github.com/Gartic/scroll#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "eslint": "^3.9.0",
+	"eventos": "git+https://github.com/Gartic/eventos.git",
+    "pre-commit": "^1.1.3"
+  },
+  "dependencies": {}
+}
