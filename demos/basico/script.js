@@ -1,7 +1,7 @@
 'use strict';
 
 let elem = document.getElementById('container');
-let scroll = new Scroll(elem,['sombra-top','sombra-middle','sombra-bottom'],true,25,true);
+let scroll = new Scroll(elem,['sombra-top','sombra-middle','sombra-bottom'],true,40,true);
 scroll.on('fim', () => {
 	document.getElementById('fim').innerText = `Fim da rolagem (${Date.now()})`;
 });

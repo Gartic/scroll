@@ -36,6 +36,10 @@ Construtor da classe, iniciando variáveis globais da classe e rotina.
 
 Adiciona um elemento ao scroll.
 
+### scroll.refresh()
+
+Atualiza parâmetros do scroll.
+
 ### scroll.scrollTo(y)
 - `y` **Number** - Coordenada Y para posicionamento do topo do scroll
 

@@ -52,7 +52,6 @@ var Scroll = function (_Eventos) {
 				_this._scrollbarStart(e);
 			}, false);
 			_this._elem.appendChild(_this._scrollbar);
-			_this._scrollbarSize();
 		}
 
 		_this._classInit = elem.className;
@@ -87,8 +86,8 @@ var Scroll = function (_Eventos) {
 			_this._sombras();
 		}, false);
 
-		//inicializando sombras
-		_this._sombras();
+		//inicializando sombras e scroll
+		_this.refresh();
 		return _this;
 	}
 
@@ -116,6 +115,24 @@ var Scroll = function (_Eventos) {
 				var elem = this._scroll.childNodes[0];
 				if (this._manterPosicao) this._scroll.scrollTop -= elem.offsetHeight;
 				this._scroll.removeChild(elem);
+			}
+		}
+
+		/**
+   * Calcula o tamanho do scrollbar
+   */
+
+	}, {
+		key: '_scrollbarSize',
+		value: function _scrollbarSize() {
+			if (this._scrollbar) {
+				var fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
+				if (fator < 1) {
+					var altura = Math.floor(this._scroll.offsetHeight * fator);
+					this._scrollbar.style.display = '';
+					this._scrollbar.style.height = altura + 'px';
+					this._scrollbar.style.top = this._scroll.scrollTop / (this._scroll.scrollHeight - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura) + 'px';
+				} else this._scrollbar.style.display = 'none';
 			}
 		}
 
@@ -153,20 +170,6 @@ var Scroll = function (_Eventos) {
 
 			e.stopPropagation();
 			e.preventDefault();
-		}
-
-		/**
-   * Calcula o tamanho do scrollbar
-   */
-
-	}, {
-		key: '_scrollbarSize',
-		value: function _scrollbarSize() {
-			var fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
-			if (fator < 1) {
-				this._scrollbar.style.display = '';
-				this._scrollbar.style.height = Math.floor(this._scroll.offsetHeight * fator) + 'px';
-			} else this._scrollbar.style.display = 'none';
 		}
 
 		/**
@@ -216,8 +219,17 @@ var Scroll = function (_Eventos) {
 			this._scroll.appendChild(elem);
 
 			//mantendo scroll no fim
-			if (this._manterPosicao && fim) this._scroll.scrollTop = this._scroll.scrollHeight;
+			if (this._manterPosicao && fim) this.scrollTo(this._scroll.scrollHeight);else this.refresh();
+		}
 
+		/**
+   * Atualiza parâmetros do scroll
+   */
+
+	}, {
+		key: 'refresh',
+		value: function refresh() {
+			this._scrollbarSize();
 			this._sombras();
 		}
 
@@ -231,7 +243,7 @@ var Scroll = function (_Eventos) {
 		key: 'scrollTo',
 		value: function scrollTo(y) {
 			this._scroll.scrollTop = y;
-			this._sombras();
+			this.refresh();
 		}
 	}]);
 

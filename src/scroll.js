@@ -32,7 +32,6 @@ class Scroll extends Eventos {
 				this._scrollbarStart(e);
 			},false);
 			this._elem.appendChild(this._scrollbar);
-			this._scrollbarSize();
 		}
 
 		this._classInit = elem.className;
@@ -45,8 +44,8 @@ class Scroll extends Eventos {
 			this._sombras();
 		},false);
 
-		//inicializando sombras
-		this._sombras();
+		//inicializando sombras e scroll
+		this.refresh();
 	}
 
 	/**
@@ -67,6 +66,22 @@ class Scroll extends Eventos {
 			if(this._manterPosicao)
 				this._scroll.scrollTop -= elem.offsetHeight;
 			this._scroll.removeChild(elem);
+		}
+	}
+
+	/**
+	 * Calcula o tamanho do scrollbar
+	 */
+	_scrollbarSize() {
+		if(this._scrollbar) {
+			let fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
+			if(fator < 1) {
+				let altura = Math.floor(this._scroll.offsetHeight * fator);
+				this._scrollbar.style.display = '';
+				this._scrollbar.style.height = altura + 'px';
+				this._scrollbar.style.top = ((this._scroll.scrollTop / (this._scroll.scrollHeight - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura)) + 'px';
+			} else
+				this._scrollbar.style.display = 'none';
 		}
 	}
 
@@ -100,18 +115,6 @@ class Scroll extends Eventos {
 
 		e.stopPropagation();
 		e.preventDefault();
-	}
-
-	/**
-	 * Calcula o tamanho do scrollbar
-	 */
-	_scrollbarSize() {
-		let fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
-		if(fator < 1) {
-			this._scrollbar.style.display = '';
-			this._scrollbar.style.height = Math.floor(this._scroll.offsetHeight * fator) + 'px';
-		} else
-			this._scrollbar.style.display = 'none';
 	}
 
 	/**
@@ -161,8 +164,16 @@ class Scroll extends Eventos {
 
 		//mantendo scroll no fim
 		if(this._manterPosicao && fim)
-			this._scroll.scrollTop = this._scroll.scrollHeight;
+			this.scrollTo(this._scroll.scrollHeight);
+		else
+			this.refresh();
+	}
 
+	/**
+	 * Atualiza parâmetros do scroll
+	 */
+	refresh() {
+		this._scrollbarSize();
 		this._sombras();
 	}
 
@@ -173,7 +184,7 @@ class Scroll extends Eventos {
 	 */
 	scrollTo(y) {
 		this._scroll.scrollTop = y;
-		this._sombras();
+		this.refresh();
 	}
 }
 
