@@ -13,8 +13,9 @@ class Scroll extends Eventos {
 	 * @param {Array} classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
 	 * @param {boolean} manterPosicao - Fixa a posição de visão do scroll
 	 * @param {number} elementosMax - Quantidade máxima de elementos
+	 * @param {boolean} scrollbar - Indica se fará uso de scrollbar
 	 */
-	constructor(elem, classes = false, manterPosicao = false, elementosMax = 0) {
+	constructor(elem, classes = false, manterPosicao = false, elementosMax = 0, scrollbar = false) {
 		super();
 
 		this._elem = elem;
@@ -22,6 +23,17 @@ class Scroll extends Eventos {
 		this._classes = classes;
 		this._manterPosicao = manterPosicao;
 		this._elementosMax = elementosMax;
+
+		//criando scrollbar
+		if(scrollbar) {
+			this._scrollbar = document.createElement('div');
+			this._scrollbar.className = 'scrollbar';
+			this._scrollbar.addEventListener('mousedown',e => {
+				this._scrollbarStart(e);
+			},false);
+			this._elem.appendChild(this._scrollbar);
+			this._scrollbarSize();
+		}
 
 		this._classInit = elem.className;
 
@@ -56,6 +68,50 @@ class Scroll extends Eventos {
 				this._scroll.scrollTop -= elem.offsetHeight;
 			this._scroll.removeChild(elem);
 		}
+	}
+
+	/**
+	 * Inicia o tratamento de arrasto do scrollbar
+	 *
+	 * @param {MouseEvent} e - Evento do mouse
+	 */
+	_scrollbarStart(e) {
+		let startY = e.clientY;
+		let top = this._scrollbar.offsetTop;
+		let max = this._scroll.offsetHeight - this._scrollbar.offsetHeight;
+
+		let move = e => {
+			let pos = top + e.clientY - startY;
+			if(pos < 0) pos = 0;
+			else if(pos > max) pos = max;
+
+			this._scrollbar.style.top = pos+'px';
+			this._scroll.scrollTop = (this._scroll.scrollHeight - this._scroll.offsetHeight) * pos/max;
+			e.stopPropagation();
+			e.preventDefault();
+		};
+		let end = () => {
+			document.body.removeEventListener('mousemove',move,false);
+			document.body.removeEventListener('mouseup',end,false);
+		};
+
+		document.body.addEventListener('mousemove',move,false);
+		document.body.addEventListener('mouseup',end,false);
+
+		e.stopPropagation();
+		e.preventDefault();
+	}
+
+	/**
+	 * Calcula o tamanho do scrollbar
+	 */
+	_scrollbarSize() {
+		let fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
+		if(fator < 1) {
+			this._scrollbar.style.display = '';
+			this._scrollbar.style.height = Math.floor(this._scroll.offsetHeight * fator) + 'px';
+		} else
+			this._scrollbar.style.display = 'none';
 	}
 
 	/**

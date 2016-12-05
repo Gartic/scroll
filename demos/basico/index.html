@@ -25,9 +25,18 @@
 				height: 10px;
 				background-color: rgba(0,0,0,.5);
 			}
-			#container>div {
+			#container>div:first-child {
 				height: 100%;
-				overflow: auto;
+				overflow: hidden;
+			}
+
+			#container .scrollbar {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 10px;
+				background-color: #BBB;
+				border-radius: 5px;
 			}
 
 			#fim {
@@ -66,6 +75,7 @@
 				<div>Teste 24</div>
 				<div>Teste 25</div>
 			</div>
+			<div class="scrollbar"></div>
 		</div>
 		<div id="fim"></div>
 		<button id="add">Adicionar</button>

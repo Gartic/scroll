@@ -25,8 +25,9 @@ Lista de demonstrações de uso:
 ### new Scroll(elem[, classes[, manterPosicao[, elementosMax]]])
 - `elem` **HTMLElement** - Elemento que irá englobar toda a lógica do scroll
 - `classes` **Array** - Lista de classes para aplicar a sombra (topo, meio, rodape)
-- `manterPosicao` **boolean** - Fixa a posição de visão do scroll
-- `elementosMax` **number** - Quantidade máxima de elementos
+- `manterPosicao` **Boolean** - Fixa a posição de visão do scroll
+- `elementosMax` **Number** - Quantidade máxima de elementos
+- `scrollbar` **Boolean** - Indica se fará uso de scrollbar
 
 Construtor da classe, iniciando variáveis globais da classe e rotina.
 
