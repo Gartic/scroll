@@ -185,16 +185,16 @@ class Scroll extends Eventos {
 			e.preventDefault();
 		};
 		let end = () => {
-			document.body.removeEventListener('mousemove', move, false);
-			document.body.removeEventListener('mouseup', end, false);
-			document.body.removeEventListener('touchmove', move, false);
-			document.body.removeEventListener('touchend', end, false);
+			document.removeEventListener('mousemove', move, false);
+			document.removeEventListener('mouseup', end, false);
+			document.removeEventListener('touchmove', move, false);
+			document.removeEventListener('touchend', end, false);
 		};
 
-		document.body.addEventListener('mousemove', move, false);
-		document.body.addEventListener('mouseup', end, false);
-		document.body.addEventListener('touchmove', move, false);
-		document.body.addEventListener('touchend', end, false);
+		document.addEventListener('mousemove', move, false);
+		document.addEventListener('mouseup', end, false);
+		document.addEventListener('touchmove', move, false);
+		document.addEventListener('touchend', end, false);
 
 		e.stopPropagation();
 		e.preventDefault();
