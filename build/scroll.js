@@ -51,6 +51,9 @@ var Scroll = function (_Eventos) {
 			_this._scrollbar.addEventListener('mousedown', function (e) {
 				_this._scrollbarStart(e);
 			}, false);
+			_this._scrollbar.addEventListener('touchstart', function (e) {
+				_this._scrollbarStart(e);
+			}, false);
 			_this._elem.appendChild(_this._scrollbar);
 		}
 
@@ -82,9 +85,19 @@ var Scroll = function (_Eventos) {
 			}
 		}
 
-		_this._scroll.addEventListener('scroll', function () {
-			_this._sombras();
-		}, false);
+		window.addWheelListener(_this._scroll, function (e) {
+			_this.scrollTo(_this._scroll.scrollTop + e.deltaY);
+			e.preventDefault();
+		});
+
+		// this._scroll.style.overflow = 'hidden';
+		_this._scroll.addEventListener('scroll', function (e) {
+			_this.refresh();
+			e.stopPropagation();
+		}, true);
+		_this._scroll.addEventListener('touchmove', function (e) {
+			e.stopPropagation();
+		}, true);
 
 		//inicializando sombras e scroll
 		_this.refresh();
@@ -126,12 +139,23 @@ var Scroll = function (_Eventos) {
 		key: '_scrollbarSize',
 		value: function _scrollbarSize() {
 			if (this._scrollbar) {
+				//checando se o scroll ultrapassa os limites (mobile)
+				var dif = 0,
+				    top = this._scroll.scrollTop;
+				if (this._scroll.scrollTop < 0) {
+					top = 0;
+					dif = this._scroll.scrollTop;
+				} else if (this._scroll.scrollTop + this._scroll.offsetHeight > this._scroll.scrollHeight) {
+					dif = this._scroll.scrollHeight - (this._scroll.scrollTop + this._scroll.offsetHeight);
+				}
+
+				//checando se existe scroll
 				var fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
 				if (fator < 1) {
 					var altura = Math.floor(this._scroll.offsetHeight * fator);
 					this._scrollbar.style.display = '';
-					this._scrollbar.style.height = altura + 'px';
-					this._scrollbar.style.top = this._scroll.scrollTop / (this._scroll.scrollHeight - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura) + 'px';
+					this._scrollbar.style.height = altura + dif + 'px';
+					this._scrollbar.style.top = top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura - dif) + 'px';
 				} else this._scrollbar.style.display = 'none';
 			}
 		}
@@ -147,12 +171,12 @@ var Scroll = function (_Eventos) {
 		value: function _scrollbarStart(e) {
 			var _this2 = this;
 
-			var startY = e.clientY;
+			var startY = !e.touches ? e.clientY : e.touches[0].clientY;
 			var top = this._scrollbar.offsetTop;
 			var max = this._scroll.offsetHeight - this._scrollbar.offsetHeight;
 
 			var move = function move(e) {
-				var pos = top + e.clientY - startY;
+				var pos = top + (!e.touches ? e.clientY : e.touches[0].clientY) - startY;
 				if (pos < 0) pos = 0;else if (pos > max) pos = max;
 
 				_this2._scrollbar.style.top = pos + 'px';
@@ -163,10 +187,14 @@ var Scroll = function (_Eventos) {
 			var end = function end() {
 				document.body.removeEventListener('mousemove', move, false);
 				document.body.removeEventListener('mouseup', end, false);
+				document.body.removeEventListener('touchmove', move, false);
+				document.body.removeEventListener('touchend', end, false);
 			};
 
 			document.body.addEventListener('mousemove', move, false);
 			document.body.addEventListener('mouseup', end, false);
+			document.body.addEventListener('touchmove', move, false);
+			document.body.addEventListener('touchend', end, false);
 
 			e.stopPropagation();
 			e.preventDefault();
@@ -243,16 +271,80 @@ var Scroll = function (_Eventos) {
 		key: 'scrollTo',
 		value: function scrollTo(y) {
 			this._scroll.scrollTop = y;
-			this.refresh();
 		}
 	}]);
 
 	return Scroll;
 }(Eventos);
 
+/**
+ * Tratamento do scroll do mouse crossbrowser
+ * @see {@link https://developer.mozilla.org/pt-BR/docs/Web/Events/wheel}
+ */
+
+
+(function (window, document) {
+	var prefix = '',
+	    _addEventListener = void 0,
+	    support = void 0;
+
+	// detect event model
+	if (window.addEventListener) {
+		_addEventListener = 'addEventListener';
+	} else {
+		_addEventListener = 'attachEvent';
+		prefix = 'on';
+	}
+
+	// detect available wheel event
+	support = 'onwheel' in document.createElement('div') ? 'wheel' : // Modern browsers support 'wheel'
+	document.onmousewheel !== undefined ? 'mousewheel' : // Webkit and IE support at least 'mousewheel'
+	'DOMMouseScroll'; // let's assume that remaining browsers are older Firefox
+
+	window.addWheelListener = function (elem, callback, useCapture) {
+		_addWheelListener(elem, support, callback, useCapture);
+
+		// handle MozMousePixelScroll in older Firefox
+		if (support == 'DOMMouseScroll') {
+			_addWheelListener(elem, 'MozMousePixelScroll', callback, useCapture);
+		}
+	};
+
+	function _addWheelListener(elem, eventName, callback, useCapture) {
+		elem[_addEventListener](prefix + eventName, support == 'wheel' ? callback : function (originalEvent) {
+			!originalEvent && (originalEvent = window.event);
+
+			// create a normalized event object
+			var event = {
+				// keep a ref to the original event object
+				originalEvent: originalEvent,
+				target: originalEvent.target || originalEvent.srcElement,
+				type: 'wheel',
+				deltaMode: originalEvent.type == 'MozMousePixelScroll' ? 0 : 1,
+				deltaX: 0,
+				deltaY: 0,
+				deltaZ: 0,
+				preventDefault: function preventDefault() {
+					originalEvent.preventDefault ? originalEvent.preventDefault() : originalEvent.returnValue = false;
+				}
+			};
+
+			// calculate deltaY (and deltaX) according to the event
+			if (support == 'mousewheel') {
+				event.deltaY = -1 / 40 * originalEvent.wheelDelta;
+				// Webkit also support wheelDeltaX
+				originalEvent.wheelDeltaX && (event.deltaX = -1 / 40 * originalEvent.wheelDeltaX);
+			} else {
+				event.deltaY = originalEvent.detail;
+			}
+
+			// it's time to fire the callback
+			return callback(event);
+		}, useCapture || false);
+	}
+})(window, document);
+
 // Expondo como um modulo common js
-
-
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = Scroll;
 }

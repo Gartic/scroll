@@ -1,11 +1,13 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width,minimum-scale=1">
 		<style>
 			#container {
 				width: 300px;
 				height: 300px;
 				border: 1px solid gray;
 				position: relative;
+				margin-top: 100px;
 			}
 			#container.sombra-top:before, #container.sombra-middle:before {
 				content: '';
@@ -35,14 +37,34 @@
 				top: 0;
 				right: 0;
 				width: 10px;
-				background-color: #BBB;
+				background-color: #FAA;
 				border-radius: 5px;
+			}
+			#container .scrollbar:before {
+				content: '';
+				position: relative;
+				top: -10px;
+				left: -10px;
+				right: -10px;
+				bottom: -10px;
 			}
 
 			#fim {
 				height: 30px;
 				color: red;
 				line-height: 30px;
+			}
+
+			/* Estilo especifico para celulares */
+			@media (max-device-width: 768px) {
+				::-webkit-scrollbar {
+					display: none;
+				}
+				#container>div:first-child {
+					height: 100%;
+					overflow: scroll;
+					-webkit-overflow-scrolling: touch;
+				}
 			}
 		</style>
 	</head>
