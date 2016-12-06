@@ -7,7 +7,7 @@
 				height: 300px;
 				border: 1px solid gray;
 				position: relative;
-				margin-top: 100px;
+				margin-bottom: 10px;
 			}
 			#container.sombra-top:before, #container.sombra-middle:before {
 				content: '';
@@ -32,16 +32,25 @@
 				overflow: hidden;
 			}
 
-			#container .scrollbar-vertical {
+			#container .scrollbar-vertical,
+			#container .scrollbar-horizontal {
 				position: absolute;
-				top: 0;
-				right: 0;
-				width: 10px;
-				background-color: #FAA;
+				background-color: black;
 				border-radius: 5px;
 				opacity: .5;
 			}
-			#container .scrollbar-vertical:before {
+			#container .scrollbar-horizontal {
+				bottom: 0;
+				left: 0;
+				height: 10px;
+			}
+			#container .scrollbar-vertical {
+				top: 0;
+				right: 0;
+				width: 10px;
+			}
+			#container .scrollbar-vertical:before,
+			#container .scrollbar-horizontal:before {
 				content: '';
 				position: relative;
 				top: -10px;
@@ -50,10 +59,22 @@
 				bottom: -10px;
 			}
 
-			#fim {
-				height: 30px;
-				color: red;
-				line-height: 30px;
+			#elemento {
+				position: relative;
+				background-color: #AAF;
+				width: 400px;
+				height: 400px;
+			}
+
+			#elemento:before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				border-radius: 50%;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(255,255,255,.5);
 			}
 
 			/* Estilo especifico para celulares */
@@ -71,35 +92,11 @@
 	<body>
 		<div id="container">
 			<div>
-				<div>Teste 1</div>
-				<div>Teste 2</div>
-				<div>Teste 3</div>
-				<div>Teste 4</div>
-				<div>Teste 5</div>
-				<div>Teste 6</div>
-				<div>Teste 7</div>
-				<div>Teste 8</div>
-				<div>Teste 9</div>
-				<div>Teste 10</div>
-				<div>Teste 11</div>
-				<div>Teste 12</div>
-				<div>Teste 13</div>
-				<div>Teste 14</div>
-				<div>Teste 15</div>
-				<div>Teste 16</div>
-				<div>Teste 17</div>
-				<div>Teste 18</div>
-				<div>Teste 19</div>
-				<div>Teste 20</div>
-				<div>Teste 21</div>
-				<div>Teste 22</div>
-				<div>Teste 23</div>
-				<div>Teste 24</div>
-				<div>Teste 25</div>
+				<div id="elemento"></div>
 			</div>
 		</div>
-		<div id="fim"></div>
-		<button id="add">Adicionar</button>
+		<button id="aumentar">Aumentar</button>
+		<button id="diminuir">Diminuir</button>
 
 		<script src="../dependencias/bundle.js"></script>
 		<script src="../../build/scroll.js"></script>

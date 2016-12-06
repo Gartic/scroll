@@ -13,9 +13,10 @@ class Scroll extends Eventos {
 	 * @param {Array} classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
 	 * @param {boolean} manterPosicao - Fixa a posição de visão do scroll
 	 * @param {number} elementosMax - Quantidade máxima de elementos
-	 * @param {boolean} scrollbar - Indica se fará uso de scrollbar
+	 * @param {boolean} scrollbarVertical - Indica se fará uso de scrollbar vertical
+	 * @param {boolean} scrollbarHorizontal - Indica se fará uso de scrollbar horizontal
 	 */
-	constructor(elem, classes = false, manterPosicao = false, elementosMax = 0, scrollbar = false) {
+	constructor(elem, classes = false, manterPosicao = false, elementosMax = 0, scrollbarVertical = false, scrollbarHorizontal = false) {
 		super();
 
 		this._elem = elem;
@@ -25,16 +26,29 @@ class Scroll extends Eventos {
 		this._elementosMax = elementosMax;
 
 		//criando scrollbar
-		if (scrollbar) {
-			this._scrollbar = document.createElement('div');
-			this._scrollbar.className = 'scrollbar';
-			this._scrollbar.addEventListener('mousedown', e => {
-				this._scrollbarStart(e);
+		if (scrollbarVertical) {
+			this._scrollbarVertical = document.createElement('div');
+			this._scrollbarVertical.className = 'scrollbar-vertical';
+			this._scrollbarVertical.addEventListener('mousedown', e => {
+				this._scrollbarStart(e,true);
 			}, false);
-			this._scrollbar.addEventListener('touchstart', e => {
-				this._scrollbarStart(e);
+			this._scrollbarVertical.addEventListener('touchstart', e => {
+				this._scrollbarStart(e,true);
 			}, false);
-			this._elem.appendChild(this._scrollbar);
+			this._elem.appendChild(this._scrollbarVertical);
+		}
+
+		//scroll horizontal
+		if (scrollbarHorizontal) {
+			this._scrollbarHorizontal = document.createElement('div');
+			this._scrollbarHorizontal.className = 'scrollbar-horizontal';
+			this._scrollbarHorizontal.addEventListener('mousedown', e => {
+				this._scrollbarStart(e,false);
+			}, false);
+			this._scrollbarHorizontal.addEventListener('touchstart', e => {
+				this._scrollbarStart(e,false);
+			}, false);
+			this._elem.appendChild(this._scrollbarHorizontal);
 		}
 
 		this._classInit = elem.className;
@@ -44,7 +58,7 @@ class Scroll extends Eventos {
 			this._scroll.removeChild(filho);
 
 		window.addWheelListener(this._scroll, e => {
-			this.scrollTo(this._scroll.scrollTop + e.deltaY);
+			this.scrollTo(this._scroll.scrollLeft + e.deltaX,this._scroll.scrollTop + e.deltaY);
 			e.preventDefault();
 		});
 
@@ -84,7 +98,7 @@ class Scroll extends Eventos {
 	 * Calcula o tamanho do scrollbar
 	 */
 	_scrollbarSize() {
-		if (this._scrollbar) {
+		if (this._scrollbarVertical) {
 			//checando se o scroll ultrapassa os limites (mobile)
 			let dif = 0, top = this._scroll.scrollTop;
 			if(this._scroll.scrollTop < 0) {
@@ -98,11 +112,32 @@ class Scroll extends Eventos {
 			let fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
 			if (fator < 1) {
 				let altura = Math.floor(this._scroll.offsetHeight * fator);
-				this._scrollbar.style.display = '';
-				this._scrollbar.style.height = (altura + dif) + 'px';
-				this._scrollbar.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif)) + 'px';
+				this._scrollbarVertical.style.display = '';
+				this._scrollbarVertical.style.height = (altura + dif) + 'px';
+				this._scrollbarVertical.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif)) + 'px';
 			} else
-				this._scrollbar.style.display = 'none';
+				this._scrollbarVertical.style.display = 'none';
+		}
+
+		if (this._scrollbarHorizontal) {
+			//checando se o scroll ultrapassa os limites (mobile)
+			let dif = 0, top = this._scroll.scrollLeft;
+			if(this._scroll.scrollLeft < 0) {
+				top = 0;
+				dif = this._scroll.scrollLeft;
+			} else if(this._scroll.scrollLeft + this._scroll.offsetWidth > this._scroll.scrollWidth) {
+				dif = this._scroll.scrollWidth - (this._scroll.scrollLeft + this._scroll.offsetWidth);
+			}
+
+			//checando se existe scroll
+			let fator = this._scroll.offsetWidth / this._scroll.scrollWidth;
+			if (fator < 1) {
+				let altura = Math.floor(this._scroll.offsetWidth * fator);
+				this._scrollbarHorizontal.style.display = '';
+				this._scrollbarHorizontal.style.width = (altura + dif) + 'px';
+				this._scrollbarHorizontal.style.left = ((top / (this._scroll.scrollWidth - dif - this._scroll.offsetWidth)) * (this._scroll.offsetWidth - altura - dif)) + 'px';
+			} else
+				this._scrollbarHorizontal.style.display = 'none';
 		}
 	}
 
@@ -110,19 +145,38 @@ class Scroll extends Eventos {
 	 * Inicia o tratamento de arrasto do scrollbar
 	 *
 	 * @param {MouseEvent} e - Evento do mouse
+	 * @param {boolean} vertical - Indica se o scroll é vertical ou horizontal
 	 */
-	_scrollbarStart(e) {
-		let startY = (!e.touches) ? e.clientY : e.touches[0].clientY;
-		let top = this._scrollbar.offsetTop;
-		let max = this._scroll.offsetHeight - this._scrollbar.offsetHeight;
+	_scrollbarStart(e, vertical) {
+		let elem, start, top, max, attr, attrScroll, coord, dif;
+
+		if(vertical) {
+			elem = this._scrollbarVertical;
+			start = (!e.touches) ? e.clientY : e.touches[0].clientY;
+			top = elem.offsetTop;
+			max = this._scroll.offsetHeight - elem.offsetHeight;
+			attr = 'top';
+			attrScroll = 'scrollTop';
+			coord = 'clientY';
+			dif = this._scroll.scrollHeight - this._scroll.offsetHeight;
+		} else {
+			elem = this._scrollbarHorizontal;
+			start = (!e.touches) ? e.clientX : e.touches[0].clientX;
+			top = elem.offsetLeft;
+			max = this._scroll.offsetWidth - elem.offsetWidth;
+			attr = 'left';
+			attrScroll = 'scrollLeft';
+			coord = 'clientX';
+			dif = this._scroll.scrollWidth - this._scroll.offsetWidth;
+		}
 
 		let move = e => {
-			let pos = top + ((!e.touches) ? e.clientY : e.touches[0].clientY) - startY;
+			let pos = top + ((!e.touches) ? e[coord] : e.touches[0][coord]) - start;
 			if (pos < 0) pos = 0;
 			else if (pos > max) pos = max;
 
-			this._scrollbar.style.top = pos + 'px';
-			this._scroll.scrollTop = (this._scroll.scrollHeight - this._scroll.offsetHeight) * pos / max;
+			elem.style[attr] = pos + 'px';
+			this._scroll[attrScroll] = dif * pos / max;
 			e.stopPropagation();
 			e.preventDefault();
 		};
@@ -189,7 +243,7 @@ class Scroll extends Eventos {
 
 		//mantendo scroll no fim
 		if (this._manterPosicao && fim)
-			this.scrollTo(this._scroll.scrollHeight);
+			this.scrollTo(undefined, this._scroll.scrollHeight);
 		else
 			this.refresh();
 	}
@@ -205,10 +259,14 @@ class Scroll extends Eventos {
 	/**
 	 * Move o scroll para um ponto específico
 	 *
+	 * @param {number} x - Coordenada X para posicionamento do topo do scroll
 	 * @param {number} y - Coordenada Y para posicionamento do topo do scroll
 	 */
-	scrollTo(y) {
-		this._scroll.scrollTop = y;
+	scrollTo(x = -1, y = -1) {
+		if(x != -1)
+			this._scroll.scrollLeft = x;
+		if(y != -1)
+			this._scroll.scrollTop = y;
 	}
 }
 
