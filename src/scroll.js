@@ -54,8 +54,12 @@ class Scroll extends Eventos {
 		this._classInit = elem.className;
 
 		//filtrando elementos de texto
-		for (let filho of this._scroll.childNodes)
-			this._scroll.removeChild(filho);
+		if (elementosMax) {
+			for (let filho of this._scroll.childNodes) {
+				if(filho.nodeType == 3)
+					this._scroll.removeChild(filho);
+			}
+		}
 
 		window.addWheelListener(this._scroll, e => {
 			this.scrollTo(this._scroll.scrollLeft + e.deltaX,this._scroll.scrollTop + e.deltaY);

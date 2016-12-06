@@ -75,27 +75,29 @@ var Scroll = function (_Eventos) {
 		_this._classInit = elem.className;
 
 		//filtrando elementos de texto
-		var _iteratorNormalCompletion = true;
-		var _didIteratorError = false;
-		var _iteratorError = undefined;
+		if (elementosMax) {
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
 
-		try {
-			for (var _iterator = _this._scroll.childNodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var filho = _step.value;
-
-				_this._scroll.removeChild(filho);
-			}
-		} catch (err) {
-			_didIteratorError = true;
-			_iteratorError = err;
-		} finally {
 			try {
-				if (!_iteratorNormalCompletion && _iterator.return) {
-					_iterator.return();
+				for (var _iterator = _this._scroll.childNodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var filho = _step.value;
+
+					if (filho.nodeType == 3) _this._scroll.removeChild(filho);
 				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
 			} finally {
-				if (_didIteratorError) {
-					throw _iteratorError;
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
 				}
 			}
 		}
