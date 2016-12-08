@@ -111,9 +111,8 @@ var Scroll = function (_Eventos) {
 		if (_this._opcoes.wheel) {
 			window.addWheelListener(_this._scroll, function (e) {
 				_this.scrollTo(_this._scroll.scrollLeft + e.deltaX, _this._scroll.scrollTop + e.deltaY);
-				e.stopPropagation();
 				e.preventDefault();
-			});
+			}, true);
 		}
 
 		// this._scroll.style.overflow = 'hidden';
@@ -280,29 +279,31 @@ var Scroll = function (_Eventos) {
 	}, {
 		key: '_sombras',
 		value: function _sombras() {
-			var classe = '';
-			var fim = this._checkFim();
+			if (this._opcoes.classes) {
+				var classe = '';
+				var fim = this._checkFim();
 
-			//baixo
-			if (!fim) {
-				if (this._opcoes.classes) {
-					if (this._scroll.scrollTop === 0) classe = this._opcoes.classes[2];
-					//topo baixo
-					else if (this._scroll.scrollTop > 0) classe = this._opcoes.classes[1];
+				//baixo
+				if (!fim) {
+					if (this._opcoes.classes) {
+						if (this._scroll.scrollTop === 0) classe = this._opcoes.classes[2];
+						//topo baixo
+						else if (this._scroll.scrollTop > 0) classe = this._opcoes.classes[1];
+					}
+				} else {
+					//topo
+					if (this._opcoes.classes && this._scroll.scrollTop > 0) classe = this._opcoes.classes[0];
+
+					//emitindo evento do final do scroll
+					_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
 				}
-			} else {
-				//topo
-				if (this._opcoes.classes && this._scroll.scrollTop > 0) classe = this._opcoes.classes[0];
 
-				//emitindo evento do final do scroll
-				_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
-			}
-
-			//trocando a classe de sombra do elemento
-			if (classe != this._sombraClasse) {
-				this._elem.classList.remove(this._sombraClasse);
-				this._elem.classList.add(classe);
-				this._sombraClasse = classe;
+				//trocando a classe de sombra do elemento
+				if (classe != this._sombraClasse) {
+					if (this._sombraClasse) this._elem.classList.remove(this._sombraClasse);
+					this._elem.classList.add(classe);
+					this._sombraClasse = classe;
+				}
 			}
 		}
 
