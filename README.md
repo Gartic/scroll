@@ -19,6 +19,7 @@ npm test
 ## Demo
 Lista de demonstrações de uso:
 - [Básico](demos/basico/) - Scroll com sombras, manter posição, limite de elementos e evento
+- [Múltiplo](demos/multiplo/) - Scroll horizontal e vertical, com alteração de tamanho
 
 ## API
 
@@ -30,8 +31,8 @@ Lista de demonstrações de uso:
 - `opcoes.elementosMax` **Number** - Quantidade máxima de elementos
 - `opcoes.scrollVertical` **Boolean** - Indica se fará uso de scrollbar vertical
 - `opcoes.scrollHorizontal` **Boolean** - Indica se fará uso de scrollbar horizontal
-- `opcoes.margemVertical` **Number** - Margem no topo e rodapé do scroll vertical
-- `opcoes.margemHorizontal` **Number** - Margem a esquerda e a direita do scroll horizontal
+- `opcoes.margemVertical` **Array** - Margem no topo e rodapé do scroll vertical
+- `opcoes.margemHorizontal` **Array** - Margem a esquerda e a direita do scroll horizontal
 
 Construtor da classe, iniciando variáveis globais da classe e rotina.
 
