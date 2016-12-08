@@ -30,11 +30,13 @@ class Scroll extends Eventos {
 			scrollVertical: true,
 			scrollHorizontal: false,
 			margemVertical: [0,0],
-			margemHorizontal: [0,0]
+			margemHorizontal: [0,0],
+			wheel: true
 		},opcoes);
 
 		this._elem = elem;
 		this._scroll = elem.querySelector('div');
+		this._sombraClasse = '';
 
 		//criando scrollbar
 		if (this._opcoes.scrollVertical) {
@@ -62,8 +64,6 @@ class Scroll extends Eventos {
 			this._elem.appendChild(this._scrollbarHorizontal);
 		}
 
-		this._classInit = elem.className;
-
 		//filtrando elementos de texto
 		if (this._opcoes.elementosMax) {
 			for (let filho of this._scroll.childNodes) {
@@ -72,10 +72,14 @@ class Scroll extends Eventos {
 			}
 		}
 
-		window.addWheelListener(this._scroll, e => {
-			this.scrollTo(this._scroll.scrollLeft + e.deltaX,this._scroll.scrollTop + e.deltaY);
-			e.preventDefault();
-		});
+		//habilitando rolagem
+		if(this._opcoes.wheel) {
+			window.addWheelListener(this._scroll, e => {
+				this.scrollTo(this._scroll.scrollLeft + e.deltaX,this._scroll.scrollTop + e.deltaY);
+				e.stopPropagation();
+				e.preventDefault();
+			});
+		}
 
 		// this._scroll.style.overflow = 'hidden';
 		this._scroll.addEventListener('scroll', e => {
@@ -215,32 +219,33 @@ class Scroll extends Eventos {
 	 * Trata a exibição de sombras de acordo com o scroll
 	 */
 	_sombras() {
-		let classes = [];
-
-		if (this._classInit)
-			classes.push(this._classInit);
-
+		let classe = '';
 		let fim = this._checkFim();
 
 		//baixo
 		if (!fim) {
 			if (this._opcoes.classes) {
 				if (this._scroll.scrollTop === 0)
-					classes.push(this._opcoes.classes[2]);
+					classe = this._opcoes.classes[2];
 				//topo baixo
 				else if (this._scroll.scrollTop > 0)
-					classes.push(this._opcoes.classes[1]);
+					classe = this._opcoes.classes[1];
 			}
 		} else {
 			//topo
 			if (this._opcoes.classes && this._scroll.scrollTop > 0)
-				classes.push(this._opcoes.classes[0]);
+				classe = this._opcoes.classes[0];
 
 			//emitindo evento do final do scroll
 			super.emit('fim');
 		}
 
-		this._elem.className = classes.join(' ');
+		//trocando a classe de sombra do elemento
+		if(classe != this._sombraClasse) {
+			this._elem.classList.remove(this._sombraClasse);
+			this._elem.classList.add(classe);
+			this._sombraClasse = classe;
+		}
 	}
 
 	/**

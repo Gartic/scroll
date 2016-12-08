@@ -45,11 +45,13 @@ var Scroll = function (_Eventos) {
 			scrollVertical: true,
 			scrollHorizontal: false,
 			margemVertical: [0, 0],
-			margemHorizontal: [0, 0]
+			margemHorizontal: [0, 0],
+			wheel: true
 		}, opcoes);
 
 		_this._elem = elem;
 		_this._scroll = elem.querySelector('div');
+		_this._sombraClasse = '';
 
 		//criando scrollbar
 		if (_this._opcoes.scrollVertical) {
@@ -76,8 +78,6 @@ var Scroll = function (_Eventos) {
 			}, false);
 			_this._elem.appendChild(_this._scrollbarHorizontal);
 		}
-
-		_this._classInit = elem.className;
 
 		//filtrando elementos de texto
 		if (_this._opcoes.elementosMax) {
@@ -107,10 +107,14 @@ var Scroll = function (_Eventos) {
 			}
 		}
 
-		window.addWheelListener(_this._scroll, function (e) {
-			_this.scrollTo(_this._scroll.scrollLeft + e.deltaX, _this._scroll.scrollTop + e.deltaY);
-			e.preventDefault();
-		});
+		//habilitando rolagem
+		if (_this._opcoes.wheel) {
+			window.addWheelListener(_this._scroll, function (e) {
+				_this.scrollTo(_this._scroll.scrollLeft + e.deltaX, _this._scroll.scrollTop + e.deltaY);
+				e.stopPropagation();
+				e.preventDefault();
+			});
+		}
 
 		// this._scroll.style.overflow = 'hidden';
 		_this._scroll.addEventListener('scroll', function (e) {
@@ -276,28 +280,30 @@ var Scroll = function (_Eventos) {
 	}, {
 		key: '_sombras',
 		value: function _sombras() {
-			var classes = [];
-
-			if (this._classInit) classes.push(this._classInit);
-
+			var classe = '';
 			var fim = this._checkFim();
 
 			//baixo
 			if (!fim) {
 				if (this._opcoes.classes) {
-					if (this._scroll.scrollTop === 0) classes.push(this._opcoes.classes[2]);
+					if (this._scroll.scrollTop === 0) classe = this._opcoes.classes[2];
 					//topo baixo
-					else if (this._scroll.scrollTop > 0) classes.push(this._opcoes.classes[1]);
+					else if (this._scroll.scrollTop > 0) classe = this._opcoes.classes[1];
 				}
 			} else {
 				//topo
-				if (this._opcoes.classes && this._scroll.scrollTop > 0) classes.push(this._opcoes.classes[0]);
+				if (this._opcoes.classes && this._scroll.scrollTop > 0) classe = this._opcoes.classes[0];
 
 				//emitindo evento do final do scroll
 				_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
 			}
 
-			this._elem.className = classes.join(' ');
+			//trocando a classe de sombra do elemento
+			if (classe != this._sombraClasse) {
+				this._elem.classList.remove(this._sombraClasse);
+				this._elem.classList.add(classe);
+				this._sombraClasse = classe;
+			}
 		}
 
 		/**
