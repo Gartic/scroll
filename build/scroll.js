@@ -23,31 +23,32 @@ var Scroll = function (_Eventos) {
   * Construtor da classe, preparando elemento de scroll
   *
   * @param {HTMLElement} elem - Elemento que irá englobar toda a lógica do scroll
-  * @param {Array} classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
-  * @param {boolean} manterPosicao - Fixa a posição de visão do scroll
-  * @param {number} elementosMax - Quantidade máxima de elementos
-  * @param {boolean} scrollbarVertical - Indica se fará uso de scrollbar vertical
-  * @param {boolean} scrollbarHorizontal - Indica se fará uso de scrollbar horizontal
+  * @param {Object} opcoes - Configurações do scroll
+  * @param {Array} opcoes.classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
+  * @param {boolean} opcoes.manterPosicao - Fixa a posição de visão do scroll
+  * @param {number} opcoes.elementosMax - Quantidade máxima de elementos
+  * @param {boolean} opcoes.scrollVertical - Indica se fará uso de scrollbar vertical
+  * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
   */
-	function Scroll(elem) {
-		var classes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-		var manterPosicao = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-		var elementosMax = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-		var scrollbarVertical = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-		var scrollbarHorizontal = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-
+	function Scroll(elem, opcoes) {
 		_classCallCheck(this, Scroll);
 
+		//opcoes padrao
 		var _this = _possibleConstructorReturn(this, (Scroll.__proto__ || Object.getPrototypeOf(Scroll)).call(this));
+
+		_this._opcoes = Object.assign({
+			classes: false,
+			manterPosicao: false,
+			elementosMax: 0,
+			scrollVertical: true,
+			scrollHorizontal: false
+		}, opcoes);
 
 		_this._elem = elem;
 		_this._scroll = elem.querySelector('div');
-		_this._classes = classes;
-		_this._manterPosicao = manterPosicao;
-		_this._elementosMax = elementosMax;
 
 		//criando scrollbar
-		if (scrollbarVertical) {
+		if (_this._opcoes.scrollVertical) {
 			_this._scrollbarVertical = document.createElement('div');
 			_this._scrollbarVertical.className = 'scrollbar-vertical';
 			_this._scrollbarVertical.addEventListener('mousedown', function (e) {
@@ -60,7 +61,7 @@ var Scroll = function (_Eventos) {
 		}
 
 		//scroll horizontal
-		if (scrollbarHorizontal) {
+		if (_this._opcoes.scrollHorizontal) {
 			_this._scrollbarHorizontal = document.createElement('div');
 			_this._scrollbarHorizontal.className = 'scrollbar-horizontal';
 			_this._scrollbarHorizontal.addEventListener('mousedown', function (e) {
@@ -75,7 +76,7 @@ var Scroll = function (_Eventos) {
 		_this._classInit = elem.className;
 
 		//filtrando elementos de texto
-		if (elementosMax) {
+		if (_this._opcoes.elementosMax) {
 			var _iteratorNormalCompletion = true;
 			var _didIteratorError = false;
 			var _iteratorError = undefined;
@@ -143,7 +144,7 @@ var Scroll = function (_Eventos) {
 		value: function _pop() {
 			if (this._scroll.childNodes.length) {
 				var elem = this._scroll.childNodes[0];
-				if (this._manterPosicao) this._scroll.scrollTop -= elem.offsetHeight;
+				if (this._opcoes.manterPosicao) this._scroll.scrollTop -= elem.offsetHeight;
 				this._scroll.removeChild(elem);
 			}
 		}
@@ -279,14 +280,14 @@ var Scroll = function (_Eventos) {
 
 			//baixo
 			if (!fim) {
-				if (this._classes) {
-					if (this._scroll.scrollTop === 0) classes.push(this._classes[2]);
+				if (this._opcoes.classes) {
+					if (this._scroll.scrollTop === 0) classes.push(this._opcoes.classes[2]);
 					//topo baixo
-					else if (this._scroll.scrollTop > 0) classes.push(this._classes[1]);
+					else if (this._scroll.scrollTop > 0) classes.push(this._opcoes.classes[1]);
 				}
 			} else {
 				//topo
-				if (this._classes && this._scroll.scrollTop > 0) classes.push(this._classes[0]);
+				if (this._opcoes.classes && this._scroll.scrollTop > 0) classes.push(this._opcoes.classes[0]);
 
 				//emitindo evento do final do scroll
 				_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
@@ -307,11 +308,11 @@ var Scroll = function (_Eventos) {
 			var fim = this._checkFim();
 
 			//mantando quantidade de elementos fixa
-			if (this._elementosMax && this._scroll.childNodes.length >= this._elementosMax) this._pop();
+			if (this._opcoes.elementosMax && this._scroll.childNodes.length >= this._opcoes.elementosMax) this._pop();
 			this._scroll.appendChild(elem);
 
 			//mantendo scroll no fim
-			if (this._manterPosicao && fim) this.scrollTo(undefined, this._scroll.scrollHeight);else this.refresh();
+			if (this._opcoes.manterPosicao && fim) this.scrollTo(undefined, this._scroll.scrollHeight);else this.refresh();
 		}
 
 		/**

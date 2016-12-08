@@ -1,7 +1,12 @@
 'use strict';
 
 var elem = document.getElementById('container');
-var scroll = new Scroll(elem,['sombra-top','sombra-middle','sombra-bottom'],true,40,true);
+var scroll = new Scroll(elem,{
+	classes: ['sombra-top','sombra-middle','sombra-bottom'],
+	manterPosicao: true,
+	elementosMax: 40,
+	scrollVertical: true
+});
 scroll.on('fim', function () {
 	document.getElementById('fim').innerText = `Fim da rolagem (${Date.now()})`;
 });

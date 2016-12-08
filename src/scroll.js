@@ -10,23 +10,30 @@ class Scroll extends Eventos {
 	 * Construtor da classe, preparando elemento de scroll
 	 *
 	 * @param {HTMLElement} elem - Elemento que irá englobar toda a lógica do scroll
-	 * @param {Array} classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
-	 * @param {boolean} manterPosicao - Fixa a posição de visão do scroll
-	 * @param {number} elementosMax - Quantidade máxima de elementos
-	 * @param {boolean} scrollbarVertical - Indica se fará uso de scrollbar vertical
-	 * @param {boolean} scrollbarHorizontal - Indica se fará uso de scrollbar horizontal
+	 * @param {Object} opcoes - Configurações do scroll
+	 * @param {Array} opcoes.classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
+	 * @param {boolean} opcoes.manterPosicao - Fixa a posição de visão do scroll
+	 * @param {number} opcoes.elementosMax - Quantidade máxima de elementos
+	 * @param {boolean} opcoes.scrollVertical - Indica se fará uso de scrollbar vertical
+	 * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
 	 */
-	constructor(elem, classes = false, manterPosicao = false, elementosMax = 0, scrollbarVertical = false, scrollbarHorizontal = false) {
+	constructor(elem, opcoes) {
 		super();
+
+		//opcoes padrao
+		this._opcoes = Object.assign({
+			classes: false,
+			manterPosicao: false,
+			elementosMax: 0,
+			scrollVertical: true,
+			scrollHorizontal: false,
+		},opcoes);
 
 		this._elem = elem;
 		this._scroll = elem.querySelector('div');
-		this._classes = classes;
-		this._manterPosicao = manterPosicao;
-		this._elementosMax = elementosMax;
 
 		//criando scrollbar
-		if (scrollbarVertical) {
+		if (this._opcoes.scrollVertical) {
 			this._scrollbarVertical = document.createElement('div');
 			this._scrollbarVertical.className = 'scrollbar-vertical';
 			this._scrollbarVertical.addEventListener('mousedown', e => {
@@ -39,7 +46,7 @@ class Scroll extends Eventos {
 		}
 
 		//scroll horizontal
-		if (scrollbarHorizontal) {
+		if (this._opcoes.scrollHorizontal) {
 			this._scrollbarHorizontal = document.createElement('div');
 			this._scrollbarHorizontal.className = 'scrollbar-horizontal';
 			this._scrollbarHorizontal.addEventListener('mousedown', e => {
@@ -54,7 +61,7 @@ class Scroll extends Eventos {
 		this._classInit = elem.className;
 
 		//filtrando elementos de texto
-		if (elementosMax) {
+		if (this._opcoes.elementosMax) {
 			for (let filho of this._scroll.childNodes) {
 				if(filho.nodeType == 3)
 					this._scroll.removeChild(filho);
@@ -92,7 +99,7 @@ class Scroll extends Eventos {
 	_pop() {
 		if (this._scroll.childNodes.length) {
 			let elem = this._scroll.childNodes[0];
-			if (this._manterPosicao)
+			if (this._opcoes.manterPosicao)
 				this._scroll.scrollTop -= elem.offsetHeight;
 			this._scroll.removeChild(elem);
 		}
@@ -213,17 +220,17 @@ class Scroll extends Eventos {
 
 		//baixo
 		if (!fim) {
-			if (this._classes) {
+			if (this._opcoes.classes) {
 				if (this._scroll.scrollTop === 0)
-					classes.push(this._classes[2]);
+					classes.push(this._opcoes.classes[2]);
 				//topo baixo
 				else if (this._scroll.scrollTop > 0)
-					classes.push(this._classes[1]);
+					classes.push(this._opcoes.classes[1]);
 			}
 		} else {
 			//topo
-			if (this._classes && this._scroll.scrollTop > 0)
-				classes.push(this._classes[0]);
+			if (this._opcoes.classes && this._scroll.scrollTop > 0)
+				classes.push(this._opcoes.classes[0]);
 
 			//emitindo evento do final do scroll
 			super.emit('fim');
@@ -241,12 +248,12 @@ class Scroll extends Eventos {
 		let fim = this._checkFim();
 
 		//mantando quantidade de elementos fixa
-		if (this._elementosMax && this._scroll.childNodes.length >= this._elementosMax)
+		if (this._opcoes.elementosMax && this._scroll.childNodes.length >= this._opcoes.elementosMax)
 			this._pop();
 		this._scroll.appendChild(elem);
 
 		//mantendo scroll no fim
-		if (this._manterPosicao && fim)
+		if (this._opcoes.manterPosicao && fim)
 			this.scrollTo(undefined, this._scroll.scrollHeight);
 		else
 			this.refresh();

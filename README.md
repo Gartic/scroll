@@ -22,13 +22,14 @@ Lista de demonstrações de uso:
 
 ## API
 
-### new Scroll(elem[, classes[, manterPosicao[, elementosMax[, scrollbarVertical[, scrollbarHorizontal]]]]])
+### new Scroll(elem[, opcoes])
 - `elem` **HTMLElement** - Elemento que irá englobar toda a lógica do scroll
-- `classes` **Array** - Lista de classes para aplicar a sombra (topo, meio, rodape)
-- `manterPosicao` **Boolean** - Fixa a posição de visão do scroll
-- `elementosMax` **Number** - Quantidade máxima de elementos
-- `scrollbarVertical` **Boolean** - Indica se fará uso de scrollbar vertical
-- `scrollbarHorizontal` **Boolean** - Indica se fará uso de scrollbar horizontal
+- `opcoes` **Object** - Configurações do scroll
+- `opcoes.classes` **Array** - Lista de classes para aplicar a sombra (topo, meio, rodape)
+- `opcoes.manterPosicao` **Boolean** - Fixa a posição de visão do scroll
+- `opcoes.elementosMax` **Number** - Quantidade máxima de elementos
+- `opcoes.scrollVertical` **Boolean** - Indica se fará uso de scrollbar vertical
+- `opcoes.scrollHorizontal` **Boolean** - Indica se fará uso de scrollbar horizontal
 
 Construtor da classe, iniciando variáveis globais da classe e rotina.
 

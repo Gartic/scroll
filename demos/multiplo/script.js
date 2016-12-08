@@ -1,7 +1,10 @@
 'use strict';
 
 var elem = document.getElementById('container');
-var scroll = new Scroll(elem,false,true,40,true,true);
+var scroll = new Scroll(elem,{
+	scrollVertical: true,
+	scrollHorizontal: true
+});
 var tamanho = 400;
 
 document.getElementById('aumentar').addEventListener('click', function() {
