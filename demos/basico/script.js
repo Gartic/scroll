@@ -5,7 +5,8 @@ var scroll = new Scroll(elem,{
 	classes: ['sombra-top','sombra-middle','sombra-bottom'],
 	manterPosicao: true,
 	elementosMax: 40,
-	scrollVertical: true
+	scrollVertical: true,
+	margemVertical: 5
 });
 scroll.on('fim', function () {
 	document.getElementById('fim').innerText = `Fim da rolagem (${Date.now()})`;

@@ -16,6 +16,8 @@ class Scroll extends Eventos {
 	 * @param {number} opcoes.elementosMax - Quantidade máxima de elementos
 	 * @param {boolean} opcoes.scrollVertical - Indica se fará uso de scrollbar vertical
 	 * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
+	 * @param {number} opcoes.margemVertical - Margem no topo e rodapé do scroll vertical
+	 * @param {number} opcoes.margemHorizontal - Margem a esquerda e a direita do scroll horizontal
 	 */
 	constructor(elem, opcoes) {
 		super();
@@ -27,6 +29,8 @@ class Scroll extends Eventos {
 			elementosMax: 0,
 			scrollVertical: true,
 			scrollHorizontal: false,
+			margemVertical: 0,
+			margemHorizontal: 0
 		},opcoes);
 
 		this._elem = elem;
@@ -124,8 +128,8 @@ class Scroll extends Eventos {
 			if (fator < 1) {
 				let altura = Math.floor(this._scroll.offsetHeight * fator);
 				this._scrollbarVertical.style.display = '';
-				this._scrollbarVertical.style.height = (altura + dif) + 'px';
-				this._scrollbarVertical.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif)) + 'px';
+				this._scrollbarVertical.style.height = (altura + dif - this._opcoes.margemVertical*2) + 'px';
+				this._scrollbarVertical.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical) + 'px';
 			} else
 				this._scrollbarVertical.style.display = 'none';
 		}
@@ -145,8 +149,8 @@ class Scroll extends Eventos {
 			if (fator < 1) {
 				let altura = Math.floor(this._scroll.offsetWidth * fator);
 				this._scrollbarHorizontal.style.display = '';
-				this._scrollbarHorizontal.style.width = (altura + dif) + 'px';
-				this._scrollbarHorizontal.style.left = ((top / (this._scroll.scrollWidth - dif - this._scroll.offsetWidth)) * (this._scroll.offsetWidth - altura - dif)) + 'px';
+				this._scrollbarHorizontal.style.width = (altura + dif - this._opcoes.margemHorizontal*2) + 'px';
+				this._scrollbarHorizontal.style.left = ((top / (this._scroll.scrollWidth - dif - this._scroll.offsetWidth)) * (this._scroll.offsetWidth - altura - dif) + this._opcoes.margemHorizontal) + 'px';
 			} else
 				this._scrollbarHorizontal.style.display = 'none';
 		}

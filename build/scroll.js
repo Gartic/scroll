@@ -29,6 +29,8 @@ var Scroll = function (_Eventos) {
   * @param {number} opcoes.elementosMax - Quantidade máxima de elementos
   * @param {boolean} opcoes.scrollVertical - Indica se fará uso de scrollbar vertical
   * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
+  * @param {number} opcoes.margemVertical - Margem no topo e rodapé do scroll vertical
+  * @param {number} opcoes.margemHorizontal - Margem a esquerda e a direita do scroll horizontal
   */
 	function Scroll(elem, opcoes) {
 		_classCallCheck(this, Scroll);
@@ -41,7 +43,9 @@ var Scroll = function (_Eventos) {
 			manterPosicao: false,
 			elementosMax: 0,
 			scrollVertical: true,
-			scrollHorizontal: false
+			scrollHorizontal: false,
+			margemVertical: 0,
+			margemHorizontal: 0
 		}, opcoes);
 
 		_this._elem = elem;
@@ -172,8 +176,8 @@ var Scroll = function (_Eventos) {
 				if (fator < 1) {
 					var altura = Math.floor(this._scroll.offsetHeight * fator);
 					this._scrollbarVertical.style.display = '';
-					this._scrollbarVertical.style.height = altura + dif + 'px';
-					this._scrollbarVertical.style.top = top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura - dif) + 'px';
+					this._scrollbarVertical.style.height = altura + dif - this._opcoes.margemVertical * 2 + 'px';
+					this._scrollbarVertical.style.top = top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical + 'px';
 				} else this._scrollbarVertical.style.display = 'none';
 			}
 
@@ -193,8 +197,8 @@ var Scroll = function (_Eventos) {
 				if (_fator < 1) {
 					var _altura = Math.floor(this._scroll.offsetWidth * _fator);
 					this._scrollbarHorizontal.style.display = '';
-					this._scrollbarHorizontal.style.width = _altura + _dif + 'px';
-					this._scrollbarHorizontal.style.left = _top / (this._scroll.scrollWidth - _dif - this._scroll.offsetWidth) * (this._scroll.offsetWidth - _altura - _dif) + 'px';
+					this._scrollbarHorizontal.style.width = _altura + _dif - this._opcoes.margemHorizontal * 2 + 'px';
+					this._scrollbarHorizontal.style.left = _top / (this._scroll.scrollWidth - _dif - this._scroll.offsetWidth) * (this._scroll.offsetWidth - _altura - _dif) + this._opcoes.margemHorizontal + 'px';
 				} else this._scrollbarHorizontal.style.display = 'none';
 			}
 		}

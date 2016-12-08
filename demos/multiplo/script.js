@@ -3,7 +3,9 @@
 var elem = document.getElementById('container');
 var scroll = new Scroll(elem,{
 	scrollVertical: true,
-	scrollHorizontal: true
+	scrollHorizontal: true,
+	margemVertical: 10,
+	margemHorizontal: 10,
 });
 var tamanho = 400;
 
