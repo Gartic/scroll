@@ -115,13 +115,13 @@ class Scroll extends Eventos {
 			this._scrollFim = false;
 
 			//checando se o scroll ultrapassa os limites (mobile)
-			let dif = 0, top = this._scroll.scrollTop;
-			if(this._scroll.scrollTop < 0) {
+			let dif = 0, top = Math.ceil(this._scroll.scrollTop);
+			if(top < 0) {
+				dif = top;
 				top = 0;
-				dif = this._scroll.scrollTop;
-			} else if(this._scroll.scrollTop + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
+			} else if(top + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
 				this._scrollFim = true;
-				dif = this._scroll.scrollHeight - (this._scroll.scrollTop + this._scroll.offsetHeight);
+				dif = this._scroll.scrollHeight - (top + this._scroll.offsetHeight);
 			}
 
 			//checando se existe scroll
