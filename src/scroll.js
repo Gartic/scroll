@@ -37,6 +37,7 @@ class Scroll extends Eventos {
 		this._elem = elem;
 		this._scroll = elem.querySelector('div');
 		this._sombraClasse = '';
+		this._scrollFim = false;
 
 		//criando scrollbar
 		if (this._opcoes.scrollVertical) {
@@ -75,6 +76,9 @@ class Scroll extends Eventos {
 		//habilitando rolagem
 		if(this._opcoes.wheel) {
 			window.addWheelListener(this._scroll, e => {
+				//destravando manutenção de posição
+				if(e.deltaY < 0) this._scrollFim = false;
+				//movendo de acordo com o delta
 				this.scrollTo(this._scroll.scrollLeft + e.deltaX,this._scroll.scrollTop + e.deltaY);
 				e.preventDefault();
 			},true);
@@ -82,22 +86,13 @@ class Scroll extends Eventos {
 
 		// this._scroll.style.overflow = 'hidden';
 		this._scroll.addEventListener('scroll', e => {
-			this.refresh();
+			this.refresh(true);
 			e.stopPropagation();
 		}, true);
 		this._scroll.addEventListener('touchmove', e => { e.stopPropagation(); }, true);
 
 		//inicializando sombras e scroll
 		this.refresh();
-	}
-
-	/**
-	 * Checa se o scroll está no rodapé
-	 *
-	 * @returns {boolean} Se o scroll chegou ao fim.
-	 */
-	_checkFim() {
-		return (this._scroll.scrollTop + this._scroll.offsetHeight) >= this._scroll.scrollHeight;
 	}
 
 	/**
@@ -117,12 +112,15 @@ class Scroll extends Eventos {
 	 */
 	_scrollbarSize() {
 		if (this._scrollbarVertical) {
+			this._scrollFim = false;
+
 			//checando se o scroll ultrapassa os limites (mobile)
 			let dif = 0, top = this._scroll.scrollTop;
 			if(this._scroll.scrollTop < 0) {
 				top = 0;
 				dif = this._scroll.scrollTop;
-			} else if(this._scroll.scrollTop + this._scroll.offsetHeight > this._scroll.scrollHeight) {
+			} else if(this._scroll.scrollTop + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
+				this._scrollFim = true;
 				dif = this._scroll.scrollHeight - (this._scroll.scrollTop + this._scroll.offsetHeight);
 			}
 
@@ -133,8 +131,10 @@ class Scroll extends Eventos {
 				this._scrollbarVertical.style.display = '';
 				this._scrollbarVertical.style.height = (altura + dif - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1]) + 'px';
 				this._scrollbarVertical.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical[0]) + 'px';
-			} else
+			} else {
 				this._scrollbarVertical.style.display = 'none';
+				this._scrollFim = true;
+			}
 		}
 
 		if (this._scrollbarHorizontal) {
@@ -166,14 +166,13 @@ class Scroll extends Eventos {
 	 * @param {boolean} vertical - Indica se o scroll é vertical ou horizontal
 	 */
 	_scrollbarStart(e, vertical) {
-		let elem, start, top, max, attr, attrScroll, coord, dif;
+		let elem, start, top, max, attrScroll, coord, dif;
 
 		if(vertical) {
 			elem = this._scrollbarVertical;
 			start = (!e.touches) ? e.clientY : e.touches[0].clientY;
 			top = elem.offsetTop;
 			max = this._scroll.offsetHeight - elem.offsetHeight;
-			attr = 'top';
 			attrScroll = 'scrollTop';
 			coord = 'clientY';
 			dif = this._scroll.scrollHeight - this._scroll.offsetHeight;
@@ -182,7 +181,6 @@ class Scroll extends Eventos {
 			start = (!e.touches) ? e.clientX : e.touches[0].clientX;
 			top = elem.offsetLeft;
 			max = this._scroll.offsetWidth - elem.offsetWidth;
-			attr = 'left';
 			attrScroll = 'scrollLeft';
 			coord = 'clientX';
 			dif = this._scroll.scrollWidth - this._scroll.offsetWidth;
@@ -193,7 +191,6 @@ class Scroll extends Eventos {
 			if (pos < 0) pos = 0;
 			else if (pos > max) pos = max;
 
-			elem.style[attr] = pos + 'px';
 			this._scroll[attrScroll] = dif * pos / max;
 			e.stopPropagation();
 			e.preventDefault();
@@ -220,12 +217,11 @@ class Scroll extends Eventos {
 	_sombras() {
 		if(this._opcoes.classes) {
 			let classe = '';
-			let fim = this._checkFim();
 
 			//baixo
-			if (!fim) {
+			if (!this._scrollFim) {
 				if (this._opcoes.classes) {
-					if (this._scroll.scrollTop === 0)
+					if (this._scroll.scrollTop <= 0)
 						classe = this._opcoes.classes[2];
 					//topo baixo
 					else if (this._scroll.scrollTop > 0)
@@ -255,24 +251,22 @@ class Scroll extends Eventos {
 	 * @param {HTMLElement} elem - Elemento a ser adicionado
 	 */
 	append(elem) {
-		let fim = this._checkFim();
-
 		//mantando quantidade de elementos fixa
 		if (this._opcoes.elementosMax && this._scroll.childNodes.length >= this._opcoes.elementosMax)
 			this._pop();
 		this._scroll.appendChild(elem);
 
 		//mantendo scroll no fim
-		if (this._opcoes.manterPosicao && fim)
-			this.scrollTo(undefined, this._scroll.scrollHeight);
-		else
-			this.refresh();
+		this.refresh();
 	}
 
 	/**
 	 * Atualiza parâmetros do scroll
+	 *
+	 * @param {boolean} manual - Indica se a atualização está sendo feita por scroll do usuario
 	 */
-	refresh() {
+	refresh(manual = false) {
+		if(!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(-1,this._scroll.scrollHeight);
 		this._scrollbarSize();
 		this._sombras();
 	}

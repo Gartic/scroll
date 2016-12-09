@@ -52,6 +52,7 @@ var Scroll = function (_Eventos) {
 		_this._elem = elem;
 		_this._scroll = elem.querySelector('div');
 		_this._sombraClasse = '';
+		_this._scrollFim = false;
 
 		//criando scrollbar
 		if (_this._opcoes.scrollVertical) {
@@ -110,6 +111,9 @@ var Scroll = function (_Eventos) {
 		//habilitando rolagem
 		if (_this._opcoes.wheel) {
 			window.addWheelListener(_this._scroll, function (e) {
+				//destravando manutenção de posição
+				if (e.deltaY < 0) _this._scrollFim = false;
+				//movendo de acordo com o delta
 				_this.scrollTo(_this._scroll.scrollLeft + e.deltaX, _this._scroll.scrollTop + e.deltaY);
 				e.preventDefault();
 			}, true);
@@ -117,7 +121,7 @@ var Scroll = function (_Eventos) {
 
 		// this._scroll.style.overflow = 'hidden';
 		_this._scroll.addEventListener('scroll', function (e) {
-			_this.refresh();
+			_this.refresh(true);
 			e.stopPropagation();
 		}, true);
 		_this._scroll.addEventListener('touchmove', function (e) {
@@ -130,23 +134,11 @@ var Scroll = function (_Eventos) {
 	}
 
 	/**
-  * Checa se o scroll está no rodapé
-  *
-  * @returns {boolean} Se o scroll chegou ao fim.
+  * Remove o primeiro elemento-filho do scroll
   */
 
 
 	_createClass(Scroll, [{
-		key: '_checkFim',
-		value: function _checkFim() {
-			return this._scroll.scrollTop + this._scroll.offsetHeight >= this._scroll.scrollHeight;
-		}
-
-		/**
-   * Remove o primeiro elemento-filho do scroll
-   */
-
-	}, {
 		key: '_pop',
 		value: function _pop() {
 			if (this._scroll.childNodes.length) {
@@ -164,13 +156,16 @@ var Scroll = function (_Eventos) {
 		key: '_scrollbarSize',
 		value: function _scrollbarSize() {
 			if (this._scrollbarVertical) {
+				this._scrollFim = false;
+
 				//checando se o scroll ultrapassa os limites (mobile)
 				var dif = 0,
 				    top = this._scroll.scrollTop;
 				if (this._scroll.scrollTop < 0) {
 					top = 0;
 					dif = this._scroll.scrollTop;
-				} else if (this._scroll.scrollTop + this._scroll.offsetHeight > this._scroll.scrollHeight) {
+				} else if (this._scroll.scrollTop + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
+					this._scrollFim = true;
 					dif = this._scroll.scrollHeight - (this._scroll.scrollTop + this._scroll.offsetHeight);
 				}
 
@@ -181,7 +176,10 @@ var Scroll = function (_Eventos) {
 					this._scrollbarVertical.style.display = '';
 					this._scrollbarVertical.style.height = altura + dif - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1] + 'px';
 					this._scrollbarVertical.style.top = top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical[0] + 'px';
-				} else this._scrollbarVertical.style.display = 'none';
+				} else {
+					this._scrollbarVertical.style.display = 'none';
+					this._scrollFim = true;
+				}
 			}
 
 			if (this._scrollbarHorizontal) {
@@ -222,7 +220,6 @@ var Scroll = function (_Eventos) {
 			    start = void 0,
 			    top = void 0,
 			    max = void 0,
-			    attr = void 0,
 			    attrScroll = void 0,
 			    coord = void 0,
 			    dif = void 0;
@@ -232,7 +229,6 @@ var Scroll = function (_Eventos) {
 				start = !e.touches ? e.clientY : e.touches[0].clientY;
 				top = elem.offsetTop;
 				max = this._scroll.offsetHeight - elem.offsetHeight;
-				attr = 'top';
 				attrScroll = 'scrollTop';
 				coord = 'clientY';
 				dif = this._scroll.scrollHeight - this._scroll.offsetHeight;
@@ -241,7 +237,6 @@ var Scroll = function (_Eventos) {
 				start = !e.touches ? e.clientX : e.touches[0].clientX;
 				top = elem.offsetLeft;
 				max = this._scroll.offsetWidth - elem.offsetWidth;
-				attr = 'left';
 				attrScroll = 'scrollLeft';
 				coord = 'clientX';
 				dif = this._scroll.scrollWidth - this._scroll.offsetWidth;
@@ -251,7 +246,6 @@ var Scroll = function (_Eventos) {
 				var pos = top + (!e.touches ? e[coord] : e.touches[0][coord]) - start;
 				if (pos < 0) pos = 0;else if (pos > max) pos = max;
 
-				elem.style[attr] = pos + 'px';
 				_this2._scroll[attrScroll] = dif * pos / max;
 				e.stopPropagation();
 				e.preventDefault();
@@ -281,12 +275,11 @@ var Scroll = function (_Eventos) {
 		value: function _sombras() {
 			if (this._opcoes.classes) {
 				var classe = '';
-				var fim = this._checkFim();
 
 				//baixo
-				if (!fim) {
+				if (!this._scrollFim) {
 					if (this._opcoes.classes) {
-						if (this._scroll.scrollTop === 0) classe = this._opcoes.classes[2];
+						if (this._scroll.scrollTop <= 0) classe = this._opcoes.classes[2];
 						//topo baixo
 						else if (this._scroll.scrollTop > 0) classe = this._opcoes.classes[1];
 					}
@@ -316,23 +309,26 @@ var Scroll = function (_Eventos) {
 	}, {
 		key: 'append',
 		value: function append(elem) {
-			var fim = this._checkFim();
-
 			//mantando quantidade de elementos fixa
 			if (this._opcoes.elementosMax && this._scroll.childNodes.length >= this._opcoes.elementosMax) this._pop();
 			this._scroll.appendChild(elem);
 
 			//mantendo scroll no fim
-			if (this._opcoes.manterPosicao && fim) this.scrollTo(undefined, this._scroll.scrollHeight);else this.refresh();
+			this.refresh();
 		}
 
 		/**
    * Atualiza parâmetros do scroll
+   *
+   * @param {boolean} manual - Indica se a atualização está sendo feita por scroll do usuario
    */
 
 	}, {
 		key: 'refresh',
 		value: function refresh() {
+			var manual = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			if (!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(-1, this._scroll.scrollHeight);
 			this._scrollbarSize();
 			this._sombras();
 		}
