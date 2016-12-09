@@ -31,6 +31,7 @@ var Scroll = function (_Eventos) {
   * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
   * @param {Array} opcoes.margemVertical - Margem no topo e rodapé do scroll vertical
   * @param {Array} opcoes.margemHorizontal - Margem a esquerda e a direita do scroll horizontal
+  * @param {number} opcoes.toleranciaFim - Tolerância para detecção do fim do scroll
   */
 	function Scroll(elem, opcoes) {
 		_classCallCheck(this, Scroll);
@@ -46,7 +47,8 @@ var Scroll = function (_Eventos) {
 			scrollHorizontal: false,
 			margemVertical: [0, 0],
 			margemHorizontal: [0, 0],
-			wheel: true
+			wheel: true,
+			toleranciaFim: 0
 		}, opcoes);
 
 		_this._elem = elem;
@@ -156,18 +158,13 @@ var Scroll = function (_Eventos) {
 		key: '_scrollbarSize',
 		value: function _scrollbarSize() {
 			if (this._scrollbarVertical) {
-				this._scrollFim = false;
-
 				//checando se o scroll ultrapassa os limites (mobile)
 				var dif = 0,
 				    top = Math.ceil(this._scroll.scrollTop);
 				if (top < 0) {
 					dif = top;
 					top = 0;
-				} else if (top + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
-					this._scrollFim = true;
-					dif = this._scroll.scrollHeight - (top + this._scroll.offsetHeight);
-				}
+				} else if (top + this._scroll.offsetHeight >= this._scroll.scrollHeight) dif = this._scroll.scrollHeight - (top + this._scroll.offsetHeight);
 
 				//checando se existe scroll
 				var fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
@@ -176,10 +173,7 @@ var Scroll = function (_Eventos) {
 					this._scrollbarVertical.style.display = '';
 					this._scrollbarVertical.style.height = altura + dif - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1] + 'px';
 					this._scrollbarVertical.style.top = top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical[0] + 'px';
-				} else {
-					this._scrollbarVertical.style.display = 'none';
-					this._scrollFim = true;
-				}
+				} else this._scrollbarVertical.style.display = 'none';
 			}
 
 			if (this._scrollbarHorizontal) {
@@ -228,7 +222,7 @@ var Scroll = function (_Eventos) {
 				elem = this._scrollbarVertical;
 				start = !e.touches ? e.clientY : e.touches[0].clientY;
 				top = elem.offsetTop;
-				max = this._scroll.offsetHeight - elem.offsetHeight;
+				max = this._scroll.offsetHeight - elem.offsetHeight - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1];
 				attrScroll = 'scrollTop';
 				coord = 'clientY';
 				dif = this._scroll.scrollHeight - this._scroll.offsetHeight;
@@ -236,7 +230,7 @@ var Scroll = function (_Eventos) {
 				elem = this._scrollbarHorizontal;
 				start = !e.touches ? e.clientX : e.touches[0].clientX;
 				top = elem.offsetLeft;
-				max = this._scroll.offsetWidth - elem.offsetWidth;
+				max = this._scroll.offsetWidth - elem.offsetWidth - this._opcoes.margemHorizontal[0] - this._opcoes.margemHorizontal[1];
 				attrScroll = 'scrollLeft';
 				coord = 'clientX';
 				dif = this._scroll.scrollWidth - this._scroll.offsetWidth;
@@ -273,6 +267,13 @@ var Scroll = function (_Eventos) {
 	}, {
 		key: '_sombras',
 		value: function _sombras() {
+			//checando se chegou ao final do scroll vertical
+			if (this._scroll.scrollTop + this._scroll.offsetHeight + this._opcoes.toleranciaFim >= this._scroll.scrollHeight) {
+				this._scrollFim = true;
+				//emitindo evento do final do scroll
+				_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
+			} else this._scrollFim = false;
+
 			if (this._opcoes.classes) {
 				var classe = '';
 
@@ -286,9 +287,6 @@ var Scroll = function (_Eventos) {
 				} else {
 					//topo
 					if (this._opcoes.classes && this._scroll.scrollTop > 0) classe = this._opcoes.classes[0];
-
-					//emitindo evento do final do scroll
-					_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', this).call(this, 'fim');
 				}
 
 				//trocando a classe de sombra do elemento
@@ -328,7 +326,7 @@ var Scroll = function (_Eventos) {
 		value: function refresh() {
 			var manual = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-			if (!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(-1, this._scroll.scrollHeight);
+			if (!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(undefined, this._scroll.scrollHeight);
 			this._scrollbarSize();
 			this._sombras();
 		}
@@ -342,12 +340,24 @@ var Scroll = function (_Eventos) {
 
 	}, {
 		key: 'scrollTo',
-		value: function scrollTo() {
-			var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : -1;
-			var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
+		value: function scrollTo(x, y) {
+			if (x !== undefined) this._scroll.scrollLeft = x;
 
-			if (x != -1) this._scroll.scrollLeft = x;
-			if (y != -1) this._scroll.scrollTop = y;
+			if (y !== undefined) this._scroll.scrollTop = y;
+		}
+
+		/**
+   * Move o scroll para o fim
+   *
+   * @param {boolean} x - Mover para o fim do scroll horizontal
+   * @param {boolean} y - Mover para o fim do scroll vertical
+   */
+
+	}, {
+		key: 'scrollEnd',
+		value: function scrollEnd(x, y) {
+			if (x) this._scroll.scrollLeft = this._scroll.scrollWidth;
+			if (y) this._scroll.scrollTop = this._scroll.scrollHeight;
 		}
 	}]);
 

@@ -5,7 +5,8 @@ var scroll = new Scroll(elem,{
 	classes: ['sombra-top','sombra-middle','sombra-bottom'],
 	manterPosicao: true,
 	elementosMax: 40,
-	scrollVertical: true
+	scrollVertical: true,
+	toleranciaFim: 20
 });
 scroll.on('fim', function () {
 	document.getElementById('fim').innerText = `Fim da rolagem (${Date.now()})`;
@@ -16,4 +17,7 @@ document.getElementById('add').addEventListener('click',function () {
 	textoElem.innerText = 'Novo';
 
 	scroll.append(textoElem);
+},false);
+document.getElementById('final').addEventListener('click',function () {
+	scroll.scrollEnd(false, true);
 },false);

@@ -18,6 +18,7 @@ class Scroll extends Eventos {
 	 * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
 	 * @param {Array} opcoes.margemVertical - Margem no topo e rodapé do scroll vertical
 	 * @param {Array} opcoes.margemHorizontal - Margem a esquerda e a direita do scroll horizontal
+	 * @param {number} opcoes.toleranciaFim - Tolerância para detecção do fim do scroll
 	 */
 	constructor(elem, opcoes) {
 		super();
@@ -31,7 +32,8 @@ class Scroll extends Eventos {
 			scrollHorizontal: false,
 			margemVertical: [0,0],
 			margemHorizontal: [0,0],
-			wheel: true
+			wheel: true,
+			toleranciaFim: 0
 		},opcoes);
 
 		this._elem = elem;
@@ -112,17 +114,13 @@ class Scroll extends Eventos {
 	 */
 	_scrollbarSize() {
 		if (this._scrollbarVertical) {
-			this._scrollFim = false;
-
 			//checando se o scroll ultrapassa os limites (mobile)
 			let dif = 0, top = Math.ceil(this._scroll.scrollTop);
 			if(top < 0) {
 				dif = top;
 				top = 0;
-			} else if(top + this._scroll.offsetHeight >= this._scroll.scrollHeight) {
-				this._scrollFim = true;
+			} else if(top + this._scroll.offsetHeight >= this._scroll.scrollHeight)
 				dif = this._scroll.scrollHeight - (top + this._scroll.offsetHeight);
-			}
 
 			//checando se existe scroll
 			let fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
@@ -131,10 +129,8 @@ class Scroll extends Eventos {
 				this._scrollbarVertical.style.display = '';
 				this._scrollbarVertical.style.height = (altura + dif - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1]) + 'px';
 				this._scrollbarVertical.style.top = ((top / (this._scroll.scrollHeight - dif - this._scroll.offsetHeight)) * (this._scroll.offsetHeight - altura - dif) + this._opcoes.margemVertical[0]) + 'px';
-			} else {
+			} else
 				this._scrollbarVertical.style.display = 'none';
-				this._scrollFim = true;
-			}
 		}
 
 		if (this._scrollbarHorizontal) {
@@ -172,7 +168,7 @@ class Scroll extends Eventos {
 			elem = this._scrollbarVertical;
 			start = (!e.touches) ? e.clientY : e.touches[0].clientY;
 			top = elem.offsetTop;
-			max = this._scroll.offsetHeight - elem.offsetHeight;
+			max = this._scroll.offsetHeight - elem.offsetHeight - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1];
 			attrScroll = 'scrollTop';
 			coord = 'clientY';
 			dif = this._scroll.scrollHeight - this._scroll.offsetHeight;
@@ -180,7 +176,7 @@ class Scroll extends Eventos {
 			elem = this._scrollbarHorizontal;
 			start = (!e.touches) ? e.clientX : e.touches[0].clientX;
 			top = elem.offsetLeft;
-			max = this._scroll.offsetWidth - elem.offsetWidth;
+			max = this._scroll.offsetWidth - elem.offsetWidth - this._opcoes.margemHorizontal[0] - this._opcoes.margemHorizontal[1];
 			attrScroll = 'scrollLeft';
 			coord = 'clientX';
 			dif = this._scroll.scrollWidth - this._scroll.offsetWidth;
@@ -215,6 +211,14 @@ class Scroll extends Eventos {
 	 * Trata a exibição de sombras de acordo com o scroll
 	 */
 	_sombras() {
+		//checando se chegou ao final do scroll vertical
+		if (this._scroll.scrollTop + this._scroll.offsetHeight + this._opcoes.toleranciaFim >= this._scroll.scrollHeight) {
+			this._scrollFim = true;
+			//emitindo evento do final do scroll
+			super.emit('fim');
+		} else
+			this._scrollFim = false;
+
 		if(this._opcoes.classes) {
 			let classe = '';
 
@@ -231,9 +235,6 @@ class Scroll extends Eventos {
 				//topo
 				if (this._opcoes.classes && this._scroll.scrollTop > 0)
 					classe = this._opcoes.classes[0];
-
-				//emitindo evento do final do scroll
-				super.emit('fim');
 			}
 
 			//trocando a classe de sombra do elemento
@@ -266,7 +267,7 @@ class Scroll extends Eventos {
 	 * @param {boolean} manual - Indica se a atualização está sendo feita por scroll do usuario
 	 */
 	refresh(manual = false) {
-		if(!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(-1,this._scroll.scrollHeight);
+		if(!manual && this._opcoes.manterPosicao && this._scrollFim) this.scrollTo(undefined,this._scroll.scrollHeight);
 		this._scrollbarSize();
 		this._sombras();
 	}
@@ -277,11 +278,23 @@ class Scroll extends Eventos {
 	 * @param {number} x - Coordenada X para posicionamento do topo do scroll
 	 * @param {number} y - Coordenada Y para posicionamento do topo do scroll
 	 */
-	scrollTo(x = -1, y = -1) {
-		if(x != -1)
+	scrollTo(x, y) {
+		if(x !== undefined)
 			this._scroll.scrollLeft = x;
-		if(y != -1)
+
+		if(y !== undefined)
 			this._scroll.scrollTop = y;
+	}
+
+	/**
+	 * Move o scroll para o fim
+	 *
+	 * @param {boolean} x - Mover para o fim do scroll horizontal
+	 * @param {boolean} y - Mover para o fim do scroll vertical
+	 */
+	scrollEnd(x, y) {
+		if(x) this._scroll.scrollLeft = this._scroll.scrollWidth;
+		if(y) this._scroll.scrollTop = this._scroll.scrollHeight;
 	}
 }
 

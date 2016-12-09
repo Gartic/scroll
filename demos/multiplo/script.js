@@ -5,7 +5,8 @@ var scroll = new Scroll(elem,{
 	scrollVertical: true,
 	scrollHorizontal: true,
 	margemVertical: [0,10],
-	margemHorizontal: [0,10]
+	margemHorizontal: [0,10],
+	manterPosicao: true
 });
 var tamanho = 400;
 
@@ -23,4 +24,7 @@ document.getElementById('diminuir').addEventListener('click', function() {
 	elem.style.width = tamanho + 'px';
 	elem.style.height = tamanho + 'px';
 	scroll.refresh();
+},false);
+document.getElementById('fim').addEventListener('click', function() {
+	scroll.scrollEnd(true,true);
 },false);
