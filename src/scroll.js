@@ -167,7 +167,7 @@ class Scroll extends Eventos {
 		if(vertical) {
 			elem = this._scrollbarVertical;
 			start = (!e.touches) ? e.clientY : e.touches[0].clientY;
-			top = elem.offsetTop;
+			top = elem.offsetTop - this._opcoes.margemVertical[0];
 			max = this._scroll.offsetHeight - elem.offsetHeight - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1];
 			attrScroll = 'scrollTop';
 			coord = 'clientY';
@@ -175,7 +175,7 @@ class Scroll extends Eventos {
 		} else {
 			elem = this._scrollbarHorizontal;
 			start = (!e.touches) ? e.clientX : e.touches[0].clientX;
-			top = elem.offsetLeft;
+			top = elem.offsetLeft - this._opcoes.margemHorizontal[0];
 			max = this._scroll.offsetWidth - elem.offsetWidth - this._opcoes.margemHorizontal[0] - this._opcoes.margemHorizontal[1];
 			attrScroll = 'scrollLeft';
 			coord = 'clientX';

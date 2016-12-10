@@ -4,8 +4,8 @@ var elem = document.getElementById('container');
 var scroll = new Scroll(elem,{
 	scrollVertical: true,
 	scrollHorizontal: true,
-	margemVertical: [0,10],
-	margemHorizontal: [0,10],
+	margemVertical: [10,10],
+	margemHorizontal: [10,10],
 	manterPosicao: true
 });
 var tamanho = 400;
