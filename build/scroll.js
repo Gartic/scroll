@@ -168,7 +168,8 @@ var Scroll = function (_Eventos) {
 
 				//checando se existe scroll
 				var fator = this._scroll.offsetHeight / this._scroll.scrollHeight;
-				if (fator < 1) {
+				//bug ie fator 99%
+				if (fator < 0.99) {
 					var altura = Math.floor(this._scroll.offsetHeight * fator);
 					this._scrollbarVertical.style.display = '';
 					this._scrollbarVertical.style.height = altura + dif - this._opcoes.margemVertical[0] - this._opcoes.margemVertical[1] + 'px';
@@ -189,7 +190,8 @@ var Scroll = function (_Eventos) {
 
 				//checando se existe scroll
 				var _fator = this._scroll.offsetWidth / this._scroll.scrollWidth;
-				if (_fator < 1) {
+				//bug ie fator 99%
+				if (_fator < 0.99) {
 					var _altura = Math.floor(this._scroll.offsetWidth * _fator);
 					this._scrollbarHorizontal.style.display = '';
 					this._scrollbarHorizontal.style.width = _altura + _dif - this._opcoes.margemHorizontal[0] - this._opcoes.margemHorizontal[1] + 'px';
