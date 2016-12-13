@@ -293,9 +293,14 @@ var Scroll = function (_Eventos) {
 
 				//trocando a classe de sombra do elemento
 				if (classe != this._sombraClasse) {
+					//removendo sombra atual
 					if (this._sombraClasse) this._elem.classList.remove(this._sombraClasse);
-					this._elem.classList.add(classe);
-					this._sombraClasse = classe;
+
+					//verificando se existe sombra
+					if (classe) {
+						this._elem.classList.add(classe);
+						this._sombraClasse = classe;
+					} else this._sombraClasse = '';
 				}
 			}
 		}
