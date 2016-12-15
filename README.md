@@ -33,7 +33,8 @@ Lista de demonstrações de uso:
 - `opcoes.scrollHorizontal` **Boolean** - Indica se fará uso de scrollbar horizontal
 - `opcoes.margemVertical` **Array** - Margem no topo e rodapé do scroll vertical
 - `opcoes.margemHorizontal` **Array** - Margem a esquerda e a direita do scroll horizontal
-- `opcoes.toleranciaFim` **Number** - Tolerância para detecção do fim do scroll
+- `opcoes.tolerancia` **Number** - Tolerância para detecção do fim do scroll
+- `opcoes.autoRefresh` **Boolean** - Atualização automática do scroll
 
 Construtor da classe, iniciando variáveis globais da classe e rotina.
 
@@ -47,18 +48,32 @@ Adiciona um elemento ao scroll.
 
 Atualiza parâmetros do scroll.
 
-### scroll.scrollTo(x, y)
-- `y` **Number** - Coordenada Y para posicionamento do topo do scroll
+### scroll.scrollTo(x, y, tempo)
 - `x` **Number** - Coordenada X para posicionamento do topo do scroll
+- `y` **Number** - Coordenada Y para posicionamento do topo do scroll
+- `tempo` **Number** - Tempo em milisegundos para realizar a animação do scroll
 
 Move o scroll para um ponto específico.
 
-### scroll.scrollEnd(x,y)
+### scroll.scrollEnd(x, y, tempo)
+- `x` **Boolean** - Mover para o fim do scroll vertical
 - `y` **Boolean** - Mover para o fim do scroll horizontal
-- `x` **Booleanr** - Mover para o fim do scroll vertical
+- `tempo` **Number** - Tempo em milisegundos para realizar a animação do scroll
 
 Move o scroll para o fim.
 
+### Evento: 'inicio'
+
+Detecta que está no inicio da rolagem
+
 ### Evento: 'fim'
+
+Detecta que está no final da rolagem.
+
+### Evento: 'scroll'
+- `x` **Number**
+- `y` **Number**
+- `start` **Number**
+- `time` **Number**
 
 Detecta que está no final da rolagem.

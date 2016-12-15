@@ -1,5 +1,7 @@
 'use strict';
 
+import Scroll from '../../src/scroll.js';
+
 var elem = document.getElementById('container');
 var scroll = new Scroll(elem,{
 	scrollVertical: true,

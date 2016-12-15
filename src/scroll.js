@@ -1,6 +1,7 @@
 'use strict';
 
-/*global Eventos*/
+//Dependência do projeto
+import Eventos from 'eventos';
 
 /**
  * Classe para o tratamente genérico de scrolls
@@ -9,16 +10,17 @@ class Scroll extends Eventos {
 	/**
 	 * Construtor da classe, preparando elemento de scroll
 	 *
-	 * @param {HTMLElement} elem - Elemento que irá englobar toda a lógica do scroll
-	 * @param {Object} opcoes - Configurações do scroll
-	 * @param {Array} opcoes.classes - Lista de classes para aplicar a sombra (topo, meio, rodape)
-	 * @param {boolean} opcoes.manterPosicao - Fixa a posição de visão do scroll
-	 * @param {number} opcoes.elementosMax - Quantidade máxima de elementos
-	 * @param {boolean} opcoes.scrollVertical - Indica se fará uso de scrollbar vertical
-	 * @param {boolean} opcoes.scrollHorizontal - Indica se fará uso de scrollbar horizontal
-	 * @param {Array} opcoes.margemVertical - Margem no topo e rodapé do scroll vertical
-	 * @param {Array} opcoes.margemHorizontal - Margem a esquerda e a direita do scroll horizontal
-	 * @param {number} opcoes.toleranciaFim - Tolerância para detecção do fim do scroll
+	 * @param {HTMLElement} elem Elemento que irá englobar toda a lógica do scroll
+	 * @param {Object} opcoes Configurações do scroll
+	 * @param {Array} opcoes.classes Lista de classes para aplicar a sombra (topo, meio, rodape)
+	 * @param {boolean} opcoes.manterPosicao Fixa a posição de visão do scroll
+	 * @param {number} opcoes.elementosMax Quantidade máxima de elementos
+	 * @param {boolean} opcoes.scrollVertical Indica se fará uso de scrollbar vertical
+	 * @param {boolean} opcoes.scrollHorizontal Indica se fará uso de scrollbar horizontal
+	 * @param {Array} opcoes.margemVertical Margem no topo e rodapé do scroll vertical
+	 * @param {Array} opcoes.margemHorizontal Margem a esquerda e a direita do scroll horizontal
+	 * @param {number} opcoes.tolerancia Tolerância para detecção do fim do scroll
+	 * @param {boolean} opcoes.nativo Indica o uso de scroll nativo
 	 */
 	constructor(elem, opcoes) {
 		super();
@@ -33,13 +35,34 @@ class Scroll extends Eventos {
 			margemVertical: [0,0],
 			margemHorizontal: [0,0],
 			wheel: true,
-			toleranciaFim: 0
+			tolerancia: 0,
+			nativo: false
 		},opcoes);
 
 		this._elem = elem;
 		this._scroll = elem.querySelector('div');
 		this._sombraClasse = '';
 		this._scrollFim = false;
+		this._startTime = 0;
+		this._startPosition = { x: 0, y: 0 };
+		this._moving = false;
+
+		// this._scroll.style.overflow = 'hidden';
+		this._scroll.addEventListener('scroll', e => {
+			this.refresh(true);
+			e.stopPropagation();
+		}, true);
+		this._scroll.addEventListener('touchmove', e => {
+			if(!this._moving)
+				e.stopPropagation();
+		}, true);
+
+		//simulando scroll touch
+		if(!this._opcoes.nativo) {
+			this._elem.addEventListener('touchstart', e => {
+				this._scrollbarStart(e,true,true);
+			}, false);
+		}
 
 		//criando scrollbar
 		if (this._opcoes.scrollVertical) {
@@ -85,13 +108,6 @@ class Scroll extends Eventos {
 				e.preventDefault();
 			},true);
 		}
-
-		// this._scroll.style.overflow = 'hidden';
-		this._scroll.addEventListener('scroll', e => {
-			this.refresh(true);
-			e.stopPropagation();
-		}, true);
-		this._scroll.addEventListener('touchmove', e => { e.stopPropagation(); }, true);
 
 		//inicializando sombras e scroll
 		this.refresh();
@@ -160,11 +176,14 @@ class Scroll extends Eventos {
 	/**
 	 * Inicia o tratamento de arrasto do scrollbar
 	 *
-	 * @param {MouseEvent} e - Evento do mouse
-	 * @param {boolean} vertical - Indica se o scroll é vertical ou horizontal
+	 * @param {MouseEvent} e Evento do mouse
+	 * @param {boolean} vertical Indica se o scroll é vertical ou horizontal
+	 * @param {boolean} invertido Troca a direção do scroll
 	 */
-	_scrollbarStart(e, vertical) {
+	_scrollbarStart(e, vertical, invertido = false) {
 		let elem, start, top, max, attrScroll, coord, dif;
+
+		this._moving = true;
 
 		if(vertical) {
 			elem = this._scrollbarVertical;
@@ -185,7 +204,12 @@ class Scroll extends Eventos {
 		}
 
 		let move = e => {
-			let pos = top + ((!e.touches) ? e[coord] : e.touches[0][coord]) - start;
+			let pos;
+			if(!invertido)
+				pos = top + ((!e.touches) ? e[coord] : e.touches[0][coord]) - start;
+			else
+				pos = top + start - ((!e.touches) ? e[coord] : e.touches[0][coord]);
+
 			if (pos < 0) pos = 0;
 			else if (pos > max) pos = max;
 
@@ -198,6 +222,7 @@ class Scroll extends Eventos {
 			document.removeEventListener('mouseup', end, false);
 			document.removeEventListener('touchmove', move, false);
 			document.removeEventListener('touchend', end, false);
+			this._moving = false;
 		};
 
 		document.addEventListener('mousemove', move, false);
@@ -213,21 +238,28 @@ class Scroll extends Eventos {
 	 * Trata a exibição de sombras de acordo com o scroll
 	 */
 	_sombras() {
+		let inicio = (this._scroll.scrollTop - this._opcoes.tolerancia <= 0);
+
 		//checando se chegou ao final do scroll vertical
-		if (this._scroll.scrollTop + this._scroll.offsetHeight + this._opcoes.toleranciaFim >= this._scroll.scrollHeight) {
+		if (this._scroll.scrollTop + this._scroll.offsetHeight + this._opcoes.tolerancia >= this._scroll.scrollHeight) {
 			this._scrollFim = true;
 			//emitindo evento do final do scroll
 			super.emit('fim');
 		} else
 			this._scrollFim = false;
 
+		//checando se chegou ao inicio do scroll
+		if(inicio)
+			super.emit('inicio');
+
+		//verificando suporte a sombras
 		if(this._opcoes.classes) {
 			let classe = '';
 
 			//baixo
 			if (!this._scrollFim) {
 				if (this._opcoes.classes) {
-					if (this._scroll.scrollTop <= 0)
+					if (inicio)
 						classe = this._opcoes.classes[2];
 					//topo baixo
 					else if (this._scroll.scrollTop > 0)
@@ -284,8 +316,8 @@ class Scroll extends Eventos {
 	/**
 	 * Move o scroll para um ponto específico
 	 *
-	 * @param {number} x - Coordenada X para posicionamento do topo do scroll
-	 * @param {number} y - Coordenada Y para posicionamento do topo do scroll
+	 * @param {number} x Coordenada X para posicionamento do topo do scroll
+	 * @param {number} y Coordenada Y para posicionamento do topo do scroll
 	 */
 	scrollTo(x, y) {
 		if(x !== undefined)
@@ -298,12 +330,13 @@ class Scroll extends Eventos {
 	/**
 	 * Move o scroll para o fim
 	 *
-	 * @param {boolean} x - Mover para o fim do scroll horizontal
-	 * @param {boolean} y - Mover para o fim do scroll vertical
+	 * @param {boolean} x Mover para o fim do scroll horizontal
+	 * @param {boolean} y Mover para o fim do scroll vertical
 	 */
 	scrollEnd(x, y) {
-		if(x) this._scroll.scrollLeft = this._scroll.scrollWidth;
-		if(y) this._scroll.scrollTop = this._scroll.scrollHeight;
+		x = (x) ? this._scroll.scrollWidth : undefined;
+		y = (y) ? this._scroll.scrollHeight : undefined;
+		this.scrollTo(x,y);
 	}
 }
 
@@ -375,7 +408,9 @@ class Scroll extends Eventos {
 
 })(window, document);
 
-// Expondo como um modulo common js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = Scroll;
-}
+// // Expondo como um modulo common js
+// if (typeof module !== 'undefined' && module.exports) {
+// 	module.exports = Scroll;
+// }
+
+export default Scroll;
