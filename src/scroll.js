@@ -408,9 +408,4 @@ class Scroll extends Eventos {
 
 })(window, document);
 
-// // Expondo como um modulo common js
-// if (typeof module !== 'undefined' && module.exports) {
-// 	module.exports = Scroll;
-// }
-
 export default Scroll;

@@ -9,14 +9,6 @@ let config = {
 	}
 };
 
-let build = Object.assign({
-	entry: './src/scroll.js',
-	output: {
-		path: './build/',
-		filename: 'scroll.js'
-	}
-},config);
-
 // Demo basico
 let basico = Object.assign({
 	entry: './demos/basico/script.js',
@@ -36,5 +28,5 @@ let multiplo = Object.assign({
 },config);
 
 module.exports = [
-	build, basico, multiplo
+	basico, multiplo
 ];
