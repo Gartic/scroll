@@ -44,8 +44,6 @@ class Scroll extends Eventos {
 		this._scroll = elem.querySelector('div');
 		this._sombraClasse = '';
 		this._scrollFim = false;
-		this._startTime = 0;
-		this._startPosition = { x: 0, y: 0 };
 		this._moving = false;
 
 		// this._scroll.style.overflow = 'hidden';
@@ -191,10 +189,6 @@ class Scroll extends Eventos {
 		let elem, start, top, max, attrScroll, coord, dif;
 
 		this._moving = true;
-		this._startPosition = {
-			x: this._scroll.scrollLeft,
-			y: this._scroll.scrollTop
-		};
 
 		if(vertical) {
 			elem = this._scrollbarVertical;
@@ -236,14 +230,6 @@ class Scroll extends Eventos {
 			if(!invertido) document.removeEventListener('touchmove', move, false);
 			document.removeEventListener('touchend', end, true);
 			this._moving = false;
-
-			if((this._opcoes.scrollVertical && Math.abs(this._startPosition.y - this._scroll.scrollTop) > this._opcoes.tolerancia)
-			|| (this._opcoes.scrollHorizontal && Math.abs(this._startPosition.x - this._scroll.scrollLeft) > this._opcoes.tolerancia)) {
-				super.emit('moveu');
-
-				e.preventDefault();
-				e.stopPropagation();
-			}
 		};
 
 		document.addEventListener('mousemove', move, false);

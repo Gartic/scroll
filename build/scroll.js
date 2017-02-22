@@ -67,8 +67,6 @@ var Scroll = function (_Eventos) {
 		_this._scroll = elem.querySelector('div');
 		_this._sombraClasse = '';
 		_this._scrollFim = false;
-		_this._startTime = 0;
-		_this._startPosition = { x: 0, y: 0 };
 		_this._moving = false;
 
 		// this._scroll.style.overflow = 'hidden';
@@ -252,10 +250,6 @@ var Scroll = function (_Eventos) {
 			    dif = void 0;
 
 			this._moving = true;
-			this._startPosition = {
-				x: this._scroll.scrollLeft,
-				y: this._scroll.scrollTop
-			};
 
 			if (vertical) {
 				elem = this._scrollbarVertical;
@@ -289,13 +283,6 @@ var Scroll = function (_Eventos) {
 				if (!invertido) document.removeEventListener('touchmove', move, false);
 				document.removeEventListener('touchend', end, true);
 				_this2._moving = false;
-
-				if (_this2._opcoes.scrollVertical && Math.abs(_this2._startPosition.y - _this2._scroll.scrollTop) > _this2._opcoes.tolerancia || _this2._opcoes.scrollHorizontal && Math.abs(_this2._startPosition.x - _this2._scroll.scrollLeft) > _this2._opcoes.tolerancia) {
-					_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', _this2).call(_this2, 'moveu');
-
-					e.preventDefault();
-					e.stopPropagation();
-				}
 			};
 
 			document.addEventListener('mousemove', move, false);
