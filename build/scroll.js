@@ -75,10 +75,6 @@ var Scroll = function (_Eventos) {
 			_this.refresh(true);
 			e.stopPropagation();
 		}, false);
-		// this._scroll.addEventListener('touchmove', e => {
-		// 	if(!this._moving)
-		// 		e.stopPropagation();
-		// }, false);
 
 		//simulando scroll touch
 		if (!_this._opcoes.nativo) {
@@ -94,10 +90,12 @@ var Scroll = function (_Eventos) {
 			_this._scrollbarVertical.addEventListener('mousedown', function (e) {
 				_this._scrollbarStart(e, true);
 				e.stopPropagation();
+				e.preventDefault();
 			}, false);
 			_this._scrollbarVertical.addEventListener('touchstart', function (e) {
 				_this._scrollbarStart(e, true);
 				e.stopPropagation();
+				e.preventDefault();
 			}, false);
 			_this._elem.appendChild(_this._scrollbarVertical);
 		}

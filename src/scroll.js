@@ -52,10 +52,6 @@ class Scroll extends Eventos {
 			this.refresh(true);
 			e.stopPropagation();
 		}, false);
-		// this._scroll.addEventListener('touchmove', e => {
-		// 	if(!this._moving)
-		// 		e.stopPropagation();
-		// }, false);
 
 		//simulando scroll touch
 		if(!this._opcoes.nativo) {
@@ -71,10 +67,12 @@ class Scroll extends Eventos {
 			this._scrollbarVertical.addEventListener('mousedown', e => {
 				this._scrollbarStart(e,true);
 				e.stopPropagation();
+				e.preventDefault();
 			}, false);
 			this._scrollbarVertical.addEventListener('touchstart', e => {
 				this._scrollbarStart(e,true);
 				e.stopPropagation();
+				e.preventDefault();
 			}, false);
 			this._elem.appendChild(this._scrollbarVertical);
 		}
