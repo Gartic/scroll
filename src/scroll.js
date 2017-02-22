@@ -52,10 +52,10 @@ class Scroll extends Eventos {
 			this.refresh(true);
 			e.stopPropagation();
 		}, false);
-		this._scroll.addEventListener('touchmove', e => {
-			if(!this._moving)
-				e.stopPropagation();
-		}, false);
+		// this._scroll.addEventListener('touchmove', e => {
+		// 	if(!this._moving)
+		// 		e.stopPropagation();
+		// }, false);
 
 		//simulando scroll touch
 		if(!this._opcoes.nativo) {

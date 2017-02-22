@@ -75,9 +75,10 @@ var Scroll = function (_Eventos) {
 			_this.refresh(true);
 			e.stopPropagation();
 		}, false);
-		_this._scroll.addEventListener('touchmove', function (e) {
-			if (!_this._moving) e.stopPropagation();
-		}, false);
+		// this._scroll.addEventListener('touchmove', e => {
+		// 	if(!this._moving)
+		// 		e.stopPropagation();
+		// }, false);
 
 		//simulando scroll touch
 		if (!_this._opcoes.nativo) {
