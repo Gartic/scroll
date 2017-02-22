@@ -36,7 +36,8 @@ class Scroll extends Eventos {
 			margemHorizontal: [0,0],
 			wheel: true,
 			tolerancia: 0,
-			nativo: false
+			nativo: false,
+			propagacao: true
 		},opcoes);
 
 		this._elem = elem;
@@ -51,6 +52,10 @@ class Scroll extends Eventos {
 		this._scroll.addEventListener('scroll', e => {
 			this.refresh(true);
 			e.stopPropagation();
+		}, false);
+		this._scroll.addEventListener('touchmove', e => {
+			if(!this._opcoes.propagacao && !this._moving)
+				e.stopPropagation();
 		}, false);
 
 		//simulando scroll touch
