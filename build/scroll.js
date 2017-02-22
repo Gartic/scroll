@@ -59,8 +59,7 @@ var Scroll = function (_Eventos) {
 			margemHorizontal: [0, 0],
 			wheel: true,
 			tolerancia: 0,
-			nativo: false,
-			propagacao: true
+			nativo: false
 		}, opcoes);
 
 		_this._elem = elem;
@@ -73,9 +72,6 @@ var Scroll = function (_Eventos) {
 		_this._scroll.addEventListener('scroll', function (e) {
 			_this.refresh(true);
 			e.stopPropagation();
-		}, false);
-		_this._scroll.addEventListener('touchmove', function (e) {
-			if (!_this._opcoes.propagacao && !_this._moving) e.stopPropagation();
 		}, false);
 
 		//simulando scroll touch
