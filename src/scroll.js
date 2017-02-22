@@ -51,11 +51,11 @@ class Scroll extends Eventos {
 		this._scroll.addEventListener('scroll', e => {
 			this.refresh(true);
 			e.stopPropagation();
-		}, true);
+		}, false);
 		this._scroll.addEventListener('touchmove', e => {
 			if(!this._moving)
 				e.stopPropagation();
-		}, true);
+		}, false);
 
 		//simulando scroll touch
 		if(!this._opcoes.nativo) {
@@ -70,9 +70,11 @@ class Scroll extends Eventos {
 			this._scrollbarVertical.className = 'scrollbar-vertical';
 			this._scrollbarVertical.addEventListener('mousedown', e => {
 				this._scrollbarStart(e,true);
+				e.stopPropagation();
 			}, false);
 			this._scrollbarVertical.addEventListener('touchstart', e => {
 				this._scrollbarStart(e,true);
+				e.stopPropagation();
 			}, false);
 			this._elem.appendChild(this._scrollbarVertical);
 		}
@@ -83,9 +85,11 @@ class Scroll extends Eventos {
 			this._scrollbarHorizontal.className = 'scrollbar-horizontal';
 			this._scrollbarHorizontal.addEventListener('mousedown', e => {
 				this._scrollbarStart(e,false);
+				e.stopPropagation();
 			}, false);
 			this._scrollbarHorizontal.addEventListener('touchstart', e => {
 				this._scrollbarStart(e,false);
+				e.stopPropagation();
 			}, false);
 			this._elem.appendChild(this._scrollbarHorizontal);
 		}
@@ -184,6 +188,10 @@ class Scroll extends Eventos {
 		let elem, start, top, max, attrScroll, coord, dif;
 
 		this._moving = true;
+		this._startPosition = {
+			x: this._scroll.scrollLeft,
+			y: this._scroll.scrollTop
+		};
 
 		if(vertical) {
 			elem = this._scrollbarVertical;
@@ -210,28 +218,35 @@ class Scroll extends Eventos {
 			else
 				pos = top + start - ((!e.touches) ? e[coord] : e.touches[0][coord]);
 
-			if (pos < 0) pos = 0;
-			else if (pos > max) pos = max;
+			if (pos <= 0)
+				pos = 0;
+			else if (pos >= max)
+				pos = max;
+			else
+				e.preventDefault();
 
 			this._scroll[attrScroll] = dif * pos / max;
-			e.stopPropagation();
-			e.preventDefault();
 		};
 		let end = () => {
 			document.removeEventListener('mousemove', move, false);
 			document.removeEventListener('mouseup', end, false);
-			document.removeEventListener('touchmove', move, false);
-			document.removeEventListener('touchend', end, false);
+			if(!invertido) document.removeEventListener('touchmove', move, false);
+			document.removeEventListener('touchend', end, true);
 			this._moving = false;
+
+			if((this._opcoes.scrollVertical && Math.abs(this._startPosition.y - this._scroll.scrollTop) > this._opcoes.tolerancia)
+			|| (this._opcoes.scrollHorizontal && Math.abs(this._startPosition.x - this._scroll.scrollLeft) > this._opcoes.tolerancia)) {
+				super.emit('moveu');
+
+				e.preventDefault();
+				e.stopPropagation();
+			}
 		};
 
 		document.addEventListener('mousemove', move, false);
 		document.addEventListener('mouseup', end, false);
-		document.addEventListener('touchmove', move, false);
-		document.addEventListener('touchend', end, false);
-
-		e.stopPropagation();
-		e.preventDefault();
+		if(!invertido) document.addEventListener('touchmove', move, false);
+		document.addEventListener('touchend', end, true);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 'use strict';
 
+import 'babel-polyfill';
 import Scroll from '../../src/scroll.js';
 
 var elem = document.getElementById('container');

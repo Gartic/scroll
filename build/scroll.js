@@ -74,10 +74,10 @@ var Scroll = function (_Eventos) {
 		_this._scroll.addEventListener('scroll', function (e) {
 			_this.refresh(true);
 			e.stopPropagation();
-		}, true);
+		}, false);
 		_this._scroll.addEventListener('touchmove', function (e) {
 			if (!_this._moving) e.stopPropagation();
-		}, true);
+		}, false);
 
 		//simulando scroll touch
 		if (!_this._opcoes.nativo) {
@@ -92,9 +92,11 @@ var Scroll = function (_Eventos) {
 			_this._scrollbarVertical.className = 'scrollbar-vertical';
 			_this._scrollbarVertical.addEventListener('mousedown', function (e) {
 				_this._scrollbarStart(e, true);
+				e.stopPropagation();
 			}, false);
 			_this._scrollbarVertical.addEventListener('touchstart', function (e) {
 				_this._scrollbarStart(e, true);
+				e.stopPropagation();
 			}, false);
 			_this._elem.appendChild(_this._scrollbarVertical);
 		}
@@ -105,9 +107,11 @@ var Scroll = function (_Eventos) {
 			_this._scrollbarHorizontal.className = 'scrollbar-horizontal';
 			_this._scrollbarHorizontal.addEventListener('mousedown', function (e) {
 				_this._scrollbarStart(e, false);
+				e.stopPropagation();
 			}, false);
 			_this._scrollbarHorizontal.addEventListener('touchstart', function (e) {
 				_this._scrollbarStart(e, false);
+				e.stopPropagation();
 			}, false);
 			_this._elem.appendChild(_this._scrollbarHorizontal);
 		}
@@ -245,6 +249,10 @@ var Scroll = function (_Eventos) {
 			    dif = void 0;
 
 			this._moving = true;
+			this._startPosition = {
+				x: this._scroll.scrollLeft,
+				y: this._scroll.scrollTop
+			};
 
 			if (vertical) {
 				elem = this._scrollbarVertical;
@@ -268,27 +276,29 @@ var Scroll = function (_Eventos) {
 				var pos = void 0;
 				if (!invertido) pos = top + (!e.touches ? e[coord] : e.touches[0][coord]) - start;else pos = top + start - (!e.touches ? e[coord] : e.touches[0][coord]);
 
-				if (pos < 0) pos = 0;else if (pos > max) pos = max;
+				if (pos <= 0) pos = 0;else if (pos >= max) pos = max;else e.preventDefault();
 
 				_this2._scroll[attrScroll] = dif * pos / max;
-				e.stopPropagation();
-				e.preventDefault();
 			};
 			var end = function end() {
 				document.removeEventListener('mousemove', move, false);
 				document.removeEventListener('mouseup', end, false);
-				document.removeEventListener('touchmove', move, false);
-				document.removeEventListener('touchend', end, false);
+				if (!invertido) document.removeEventListener('touchmove', move, false);
+				document.removeEventListener('touchend', end, true);
 				_this2._moving = false;
+
+				if (_this2._opcoes.scrollVertical && Math.abs(_this2._startPosition.y - _this2._scroll.scrollTop) > _this2._opcoes.tolerancia || _this2._opcoes.scrollHorizontal && Math.abs(_this2._startPosition.x - _this2._scroll.scrollLeft) > _this2._opcoes.tolerancia) {
+					_get(Scroll.prototype.__proto__ || Object.getPrototypeOf(Scroll.prototype), 'emit', _this2).call(_this2, 'moveu');
+
+					e.preventDefault();
+					e.stopPropagation();
+				}
 			};
 
 			document.addEventListener('mousemove', move, false);
 			document.addEventListener('mouseup', end, false);
-			document.addEventListener('touchmove', move, false);
-			document.addEventListener('touchend', end, false);
-
-			e.stopPropagation();
-			e.preventDefault();
+			if (!invertido) document.addEventListener('touchmove', move, false);
+			document.addEventListener('touchend', end, true);
 		}
 
 		/**
