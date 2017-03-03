@@ -33,6 +33,6 @@
     "webpack": "^1.14.0"
   },
   "dependencies": {
-    "eventos": "git+https://github.com/Gartic/eventos.git"
+    "eventos": "git+ssh://git@github.com/Gartic/eventos.git"
   }
 }
