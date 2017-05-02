@@ -36,6 +36,7 @@ var Scroll = function (_Eventos) {
   * @param {Array} opcoes.classes Lista de classes para aplicar a sombra (topo, meio, rodape)
   * @param {boolean} opcoes.manterPosicao Fixa a posição de visão do scroll
   * @param {number} opcoes.elementosMax Quantidade máxima de elementos
+  * @param {string} opcoes.elementoScroll Query de captura do elemento de scroll
   * @param {boolean} opcoes.scrollVertical Indica se fará uso de scrollbar vertical
   * @param {boolean} opcoes.scrollHorizontal Indica se fará uso de scrollbar horizontal
   * @param {Array} opcoes.margemVertical Margem no topo e rodapé do scroll vertical
@@ -53,6 +54,7 @@ var Scroll = function (_Eventos) {
 			classes: false,
 			manterPosicao: false,
 			elementosMax: 0,
+			elementoScroll: 'div',
 			scrollVertical: true,
 			scrollHorizontal: false,
 			margemVertical: [0, 0],
@@ -63,7 +65,7 @@ var Scroll = function (_Eventos) {
 		}, opcoes);
 
 		_this._elem = elem;
-		_this._scroll = elem.querySelector('div');
+		_this._scroll = elem.querySelector(_this._opcoes.elementoScroll);
 		_this._sombraClasse = '';
 		_this._scrollFim = false;
 		_this._moving = false;

@@ -29,6 +29,7 @@ Lista de demonstrações de uso:
 - `opcoes.classes` **Array** - Lista de classes para aplicar a sombra (topo, meio, rodape)
 - `opcoes.manterPosicao` **Boolean** - Fixa a posição de visão do scroll
 - `opcoes.elementosMax` **Number** - Quantidade máxima de elementos
+- `opcoes.elementoScroll` **String** - Query de captura do elemento de scroll
 - `opcoes.scrollVertical` **Boolean** - Indica se fará uso de scrollbar vertical
 - `opcoes.scrollHorizontal` **Boolean** - Indica se fará uso de scrollbar horizontal
 - `opcoes.margemVertical` **Array** - Margem no topo e rodapé do scroll vertical

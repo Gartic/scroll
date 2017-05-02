@@ -15,6 +15,7 @@ class Scroll extends Eventos {
 	 * @param {Array} opcoes.classes Lista de classes para aplicar a sombra (topo, meio, rodape)
 	 * @param {boolean} opcoes.manterPosicao Fixa a posição de visão do scroll
 	 * @param {number} opcoes.elementosMax Quantidade máxima de elementos
+	 * @param {string} opcoes.elementoScroll Query de captura do elemento de scroll
 	 * @param {boolean} opcoes.scrollVertical Indica se fará uso de scrollbar vertical
 	 * @param {boolean} opcoes.scrollHorizontal Indica se fará uso de scrollbar horizontal
 	 * @param {Array} opcoes.margemVertical Margem no topo e rodapé do scroll vertical
@@ -30,6 +31,7 @@ class Scroll extends Eventos {
 			classes: false,
 			manterPosicao: false,
 			elementosMax: 0,
+			elementoScroll: 'div',
 			scrollVertical: true,
 			scrollHorizontal: false,
 			margemVertical: [0,0],
@@ -40,7 +42,7 @@ class Scroll extends Eventos {
 		},opcoes);
 
 		this._elem = elem;
-		this._scroll = elem.querySelector('div');
+		this._scroll = elem.querySelector(this._opcoes.elementoScroll);
 		this._sombraClasse = '';
 		this._scrollFim = false;
 		this._moving = false;
