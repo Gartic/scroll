@@ -304,6 +304,16 @@ class Scroll extends Eventos {
 	}
 
 	/**
+	 * Zerando elementos dentro do scroll
+	 */
+	empty() {
+		this._scroll.innerHTML = '';
+
+		//mantendo scroll no fim
+		this.refresh();
+	}
+
+	/**
 	 * Atualiza parâmetros do scroll
 	 *
 	 * @param {boolean} manual - Indica se a atualização está sendo feita por scroll do usuario

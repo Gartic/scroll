@@ -44,6 +44,10 @@ Construtor da classe, iniciando variáveis globais da classe e rotina.
 
 Adiciona um elemento ao scroll.
 
+### scroll.empty()
+
+Zerando elementos dentro do scroll.
+
 ### scroll.refresh([manual])
 - `manual` **Boolean** - Indica se a atualização está sendo feita por scroll do usuario
 
