@@ -347,12 +347,17 @@ var Scroll = function (_Eventos) {
 	}, {
 		key: 'append',
 		value: function append(elem) {
+			var _this3 = this;
+
 			//mantando quantidade de elementos fixa
 			if (this._opcoes.elementosMax && this._scroll.childNodes.length >= this._opcoes.elementosMax) this._pop();
 			this._scroll.appendChild(elem);
 
 			//mantendo scroll no fim
-			this.refresh();
+			this._scroll.offsetWidth;
+			setTimeout(function () {
+				return _this3.refresh();
+			}, 0);
 		}
 
 		/**
