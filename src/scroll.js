@@ -300,8 +300,7 @@ class Scroll extends Eventos {
 		this._scroll.appendChild(elem);
 
 		//mantendo scroll no fim
-		this._scroll.offsetWidth;
-		setTimeout(() => this.refresh(),0);
+		this.refresh();
 	}
 
 	/**
