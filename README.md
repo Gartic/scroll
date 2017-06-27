@@ -53,6 +53,11 @@ Zerando elementos dentro do scroll.
 
 Atualiza parâmetros do scroll.
 
+### scroll.remove(elem)
+- `elem` **HTMLElement** - Elemento a ser removido
+
+Remove um elemento do scroll.
+
 ### scroll.scrollTo(x, y, tempo)
 - `x` **Number** - Coordenada X para posicionamento do topo do scroll
 - `y` **Number** - Coordenada Y para posicionamento do topo do scroll

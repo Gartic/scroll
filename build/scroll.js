@@ -385,6 +385,18 @@ var Scroll = function (_Eventos) {
 		}
 
 		/**
+   * Remove um elemento do scroll
+   *
+   * @param {HTMLElement} elem - Elemento a ser adicionado
+   */
+
+	}, {
+		key: 'remove',
+		value: function remove(elem) {
+			this._scroll.removeChild(elem);
+		}
+
+		/**
    * Move o scroll para um ponto específico
    *
    * @param {number} x Coordenada X para posicionamento do topo do scroll
