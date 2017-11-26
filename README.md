@@ -72,6 +72,10 @@ Move o scroll para um ponto específico.
 
 Move o scroll para o fim.
 
+### scroll.scrollElem
+
+Obtém o elemento de scroll.
+
 ### Evento: 'inicio'
 
 Detecta que está no inicio da rolagem

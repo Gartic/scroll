@@ -358,6 +358,14 @@ class Scroll extends Eventos {
 		y = (y) ? this._scroll.scrollHeight : undefined;
 		this.scrollTo(x,y);
 	}
+
+	/**
+	 * Obtem o elemento de scroll
+	 * @return {HTMLElement} Elemento do scroll
+	 */
+	get scrollElem() {
+		return this._scroll;
+	}
 }
 
 /**

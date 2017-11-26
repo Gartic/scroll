@@ -425,6 +425,17 @@ var Scroll = function (_Eventos) {
 			y = y ? this._scroll.scrollHeight : undefined;
 			this.scrollTo(x, y);
 		}
+
+		/**
+   * Obtem o elemento de scroll
+   * @return {HTMLElement} Elemento do scroll
+   */
+
+	}, {
+		key: 'scrollElem',
+		get: function get() {
+			return this._scroll;
+		}
 	}]);
 
 	return Scroll;
